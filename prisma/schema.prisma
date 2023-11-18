@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,30 +7,201 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
-  id       String @id @unique @default(uuid())
-  username String @unique
-  password String
-  Card     Card[]
+  id                   Int       @id @unique @default(autoincrement())
+  username             String    @unique
+  email                String    @unique
+  name                 String
+  password             String
+  passwordConfirm      String
+  bio                  String?
+  changePasswordAt     DateTime?
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+  active               Boolean   @default(true)
+  avatar               String?
+  role                 Role      @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownWorkspaces    Workspace[]
+  workspaceMembers WorkspaceMember[]
+  boardMembers     BoardMember[]
+  comments         Comment[]
+  cardActivities   CardActivity[]
 
   @@map("users")
 }
 
-model Card {
-  id          String @id @default(uuid())
-  title       String
-  description String
-  status      card_status @default(OPEN)
-  userId      String 
+model Workspace {
+  id   Int    @id @unique @default(autoincrement())
+  name String
 
-  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownerUserId Int
+  owner       User @relation(fields: [ownerUserId], references: [id])
+
+  workspaceMembers WorkspaceMember[]
+  boards           Board[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  workspaceId Int
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([userId, workspaceId])
+  @@map("workspace_member")
+}
+
+model Template {
+  id                Int      @id @unique @default(autoincrement())
+  defaultList       String[] @default(["To do", "In progress", "Done"])
+  defaultBackground String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  boards Board[]
+
+  @@map("templates")
+}
+
+model Board {
+  id         Int     @id @unique @default(autoincrement())
+  name       String
+  background String
+  visibility Boolean @default(true) //True: visible in workspace, False: only member in board can see
+  closed     Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workspaceId Int
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  templateId  Int
+  template    Template  @relation(fields: [templateId], references: [id])
+
+  boardMembers BoardMember[]
+  lists        List[]
+
+  @@map("boards")
+}
+
+model BoardMember {
+  userId  Int
+  user    User  @relation(fields: [userId], references: [id])
+  boardId Int
+  board   Board @relation(fields: [boardId], references: [id])
+
+  starred          Boolean  @default(false)
+  viewRecentlyDate DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([userId, boardId])
+  @@map("board_member")
+}
+
+model List {
+  id              Int    @id @unique @default(autoincrement())
+  name            String
+  positionInBoard Int
+
+  boardId Int
+  board   Board @relation(fields: [boardId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cards Card[]
+
+  @@map("lists")
+}
+
+model Card {
+  id           Int      @id @unique @default(autoincrement())
+  title        String
+  description  String
+  active       Boolean  @default(true)
+  dueDate      DateTime
+  reminderDate DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listId Int
+  list   List @relation(fields: [listId], references: [id])
+
+  cardAttachments CardAttachment[]
+  comments        Comment[]
+  cardActivities  CardActivity[]
 
   @@map("cards")
 }
 
+enum AttachmentType {
+  FILE
+  LINK
+}
 
-enum card_status {
-  OPEN
-  IN_PROGRESS
-  DONE
+model CardAttachment {
+  id         Int            @id @unique @default(autoincrement())
+  uploadDate DateTime
+  fileName   String
+  url        String
+  type       AttachmentType @default(FILE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cardId Int
+  card   Card @relation(fields: [cardId], references: [id])
+
+  @@map("card_attachment")
+}
+
+model Comment {
+  id      Int    @id @unique @default(autoincrement())
+  content String
+
+  userId    Int
+  commenter User @relation(fields: [userId], references: [id])
+  cardId    Int
+  card      Card @relation(fields: [cardId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("comments")
+}
+
+model CardActivity {
+  id       Int    @id @unique @default(autoincrement())
+  activity String
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+  cardId Int
+  card   Card @relation(fields: [cardId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("card_activity")
 }
