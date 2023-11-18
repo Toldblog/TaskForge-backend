@@ -1,5 +1,5 @@
--- AddEnum
-CREATE TYPE "public"."card_status" AS ENUM ('OPEN', 'IN_PROGRESS', 'DONE');
+-- CreateEnum
+CREATE TYPE "card_status" AS ENUM ('OPEN', 'IN_PROGRESS', 'DONE');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -20,7 +20,6 @@ CREATE TABLE "cards" (
 
     CONSTRAINT "cards_pkey" PRIMARY KEY ("id")
 );
-
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_id_key" ON "users"("id");
