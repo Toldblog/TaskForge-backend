@@ -89,7 +89,8 @@ export class UsersService {
         },
       });
     } catch (error) {
-      throw error;
+        console.log(error)
+      throw new NotFoundException('User not found');
     }
   }
 }
