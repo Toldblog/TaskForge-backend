@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from '@prisma/client';
 
 @Injectable()
@@ -23,7 +22,7 @@ export class UsersService {
         data: rest,
       });
     } catch (error) {
-        console.log(error)
+      console.log(error);
       throw new NotFoundException('User not found');
     }
   }
