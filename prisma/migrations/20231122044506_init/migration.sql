@@ -11,7 +11,7 @@ CREATE TABLE "users" (
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "passwordConfirm" TEXT NOT NULL,
+    "passwordConfirm" TEXT,
     "bio" TEXT,
     "changePasswordAt" TIMESTAMP(3),
     "passwordResetToken" TEXT,

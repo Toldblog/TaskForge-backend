@@ -14,6 +14,7 @@ export class UsersService {
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(rest.password, salt);
       rest.password = hashedPassword;
+      rest.passwordConfirm = null;
       rest.changePasswordAt = new Date().toISOString();
     }
     try {

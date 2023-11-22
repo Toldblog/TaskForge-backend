@@ -18,7 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    const { username, email, name, password, passwordConfirm } =
+    const { username, email, name, password } =
       authCredentialsDto;
 
     // Hash password
@@ -32,13 +32,14 @@ export class AuthService {
           email: email,
           name: name,
           password: hashedPassword,
-          passwordConfirm: passwordConfirm,
+          passwordConfirm: null,
         },
       });
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('Username already exists');
       } else {
+        console.log(error)
         throw new InternalServerErrorException();
       }
     }
