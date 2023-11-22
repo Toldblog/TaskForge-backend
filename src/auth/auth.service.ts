@@ -47,6 +47,7 @@ export class AuthService {
       if (error.code === '23505' || error.code === 'P2002') {
         throw new ConflictException('Username or email already exists');
       } else {
+        console.log(error)
         throw new InternalServerErrorException();
       }
     }

@@ -12,7 +12,7 @@ model User {
   username             String            @unique
   email                String            @unique
   name                 String
-  password             String?
+  password             String
   passwordConfirm      String?
   bio                  String?
   changePasswordAt     DateTime?
