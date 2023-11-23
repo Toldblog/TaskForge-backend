@@ -1,4 +1,5 @@
 import {
+  IsEmail,
   IsNotEmpty,
   IsString,
   Matches,
@@ -8,10 +9,8 @@ import {
 
 export class AuthDto {
   @IsNotEmpty()
-  @IsString()
-  @MinLength(4)
-  @MaxLength(20)
-  username: string;
+  @IsEmail()
+  email: string;
 
   @IsNotEmpty()
   @IsString()

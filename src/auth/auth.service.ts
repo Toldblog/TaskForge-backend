@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthCredentialsDto } from './dtos/auth-credentials.dto';
@@ -17,10 +18,12 @@ export class AuthService {
     private prismaService: PrismaService,
     private jwtService: JwtService,
   ) {}
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    const { username, email, name, password } =
-      authCredentialsDto;
 
+  async signUp(
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<{ accessToken: string }> {
+    const { username, email, name, password } = authCredentialsDto;
+    
     // Hash password
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -35,30 +38,31 @@ export class AuthService {
           passwordConfirm: null,
         },
       });
+      const payload: JwtPayload = { email };
+      return {
+        accessToken: await this.jwtService.signAsync(payload),
+      };
     } catch (error) {
-      if (error.code === '23505') {
-        throw new ConflictException('Username already exists');
+      console.log(error);
+      if (error.code === '23505' || error.code === 'P2002') {
+        throw new ConflictException('Username or email already exists');
       } else {
-        console.log(error)
         throw new InternalServerErrorException();
       }
     }
   }
 
   async signIn(authDto: AuthDto): Promise<{ accessToken: string }> {
-    const { username, password } = authDto;
+    const { email, password } = authDto;
 
     let user: any;
-    try {
-      user = await this.prismaService.user.findUnique({
-        where: { username: username },
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    user = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+    if (!user) throw new NotFoundException('User not found');
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const payload: JwtPayload = { username: username };
+    if (await bcrypt.compare(password, user.password)) {
+      const payload: JwtPayload = { email };
       return {
         accessToken: await this.jwtService.signAsync(payload),
       };

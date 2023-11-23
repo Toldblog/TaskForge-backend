@@ -15,16 +15,12 @@ export class AuthController {
   signUp(
     @Body()
     authCredentialsDto: AuthCredentialsDto,
-  ): Promise<void> {
-    return this.authService.signUp(
-      authCredentialsDto,
-    );
+  ): Promise<{ accessToken: string }> {
+    return this.authService.signUp(authCredentialsDto);
   }
 
   @Post('/signin')
-  signIn(
-    @Body() authDto: AuthDto,
-  ): Promise<{ accessToken: string }> {
+  signIn(@Body() authDto: AuthDto): Promise<{ accessToken: string }> {
     return this.authService.signIn(authDto);
   }
 }
