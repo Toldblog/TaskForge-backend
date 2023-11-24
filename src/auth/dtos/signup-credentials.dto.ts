@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { PasswordMatch } from '../validators/password-match.validator';
 
-export class AuthCredentialsDto {
+export class SignUpCredentialsDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(4)
@@ -22,6 +22,7 @@ export class AuthCredentialsDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsString()
   @MinLength(4)
   @MaxLength(20)
   name: string;

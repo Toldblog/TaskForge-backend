@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello</title>
+    </head>
+    <body>
+        <style>
+            .blue {
+                color: blue;
+            }
+            .logo {
+                width: 200px;
+                height: 50px;
+            }
+            .text {
+                color: gray;
+            }
+            .heading {
+                color: black;
+                font-weight: 700;
+            }
+            .email {
+                color: blue;
+            }
+            .btn {
+                width: 200px;
+                height: 50px;
+                padding: 20px 40px;
+                line-height: 50px;
+                background-color: #2ea664;
+                color: white; 
+                font-weight: 700;
+                text-align: center;
+                text-decoration: none;
+            }
+            .my {
+                margin: 20px 0;
+            }
+        </style>
+        <div>
+            <img src="https://mrgsxaywdcotvdwpsrnf.supabase.co/storage/v1/object/public/TaskForge-assets/logo_blue.png" class="logo" alt="logo" />
+        </div>
+        <div class="my">
+            <h2 class="heading">Hey {{ name }}, please confirm your email address to get started on TaskForge</h2>
+            <p class="text">
+                Once you've confirmed that <b class="email">{{ email }}</b> is your email address, you can start using
+                TaskForge's services 🎉
+            </p>
+            <span class="text">Tap the button below to complete the confirmation:</span>
+        </div>
+        <div>
+            <a href="{{ url }}" class="btn">
+                Confirm Email Address
+            </a>
+        </div>
+    </body>
+</html>

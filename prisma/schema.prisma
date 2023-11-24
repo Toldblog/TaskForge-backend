@@ -18,12 +18,12 @@ model User {
   email                String    @unique
   name                 String
   password             String
-  passwordConfirm      String
+  passwordConfirm      String?
   bio                  String?
   changePasswordAt     DateTime?
   passwordResetToken   String?
   passwordResetExpires DateTime?
-  active               Boolean   @default(true)
+  active               Boolean   @default(false)
   avatar               String?
   role                 Role      @default(USER)
 
