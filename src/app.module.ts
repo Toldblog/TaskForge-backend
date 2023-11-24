@@ -6,6 +6,7 @@ import { BoardsModule } from './boards/boards.module';
 import { ListsModule } from './lists/lists.module';
 import { UsersModule } from './users/users.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
+import { MailModule } from './email/mail.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
     ListsModule,
     UsersModule,
     WorkspacesModule,
+    MailModule
   ],
   controllers: [],
   providers: [],
