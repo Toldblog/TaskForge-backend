@@ -13,7 +13,7 @@ export class MailService {
         private readonly configService: ConfigService
     ) { }
 
-    async sendUserConfirmation(user: any): Promise<void> {
+    async sendEmailVerification(user: any): Promise<void> {
         const emailToken = await this.createEmailToken(user.email);
         const url = `${this.configService.get('BASE_URL')}/mail/verify/${emailToken}`;
 
@@ -35,17 +35,17 @@ export class MailService {
         if (expired)
             return {
                 message: 'Email verification token expired.',
-                url: 'https://www.facebook.com/'
+                url: `${this.configService.get('BASE_URL')}/mail/resend-email-verification?email=${email}`
             };
 
         // Get user by email
-        const user = await this.prismaService.user.findUnique({
+        const user = await this.prismaService.user.findFirst({
             where: { email }
         });
 
         if (user.active) {
             return {
-                message: 'Email verification token expired.',
+                message: 'Email already verified.',
             };
         }
 
@@ -60,23 +60,39 @@ export class MailService {
         };
     }
 
+    async resendEmailVerification(email: string): Promise<any> {
+        const user = await this.prismaService.user.findFirst({
+            where: { email }
+        });
+
+        if (user.active) {
+            return "Email already verified.";
+        }
+
+        // resend email verification
+        await this.sendEmailVerification(user);
+
+        return "Email verification already sent again."
+    }
+
     async decodeConfirmationToken(token: string) {
         try {
-            const payload = await this.jwtService.verify(token);
+            const payload = await this.jwtService.verify(token, { ignoreExpiration: true });
 
             if (typeof payload === 'object' && 'email' in payload) {
-                return {
-                    email: payload.email,
-                    expired: false
-                };
+                if ('exp' in payload && parseFloat(Date.now().toString()) / 1000 < payload.exp) {
+                    return {
+                        email: payload.email,
+                        expired: false
+                    };
+                } else {
+                    return {
+                        email: payload.email,
+                        expired: true
+                    };
+                }
             }
         } catch (error) {
-            if (error?.name === 'TokenExpiredError') {
-                return {
-                    email: '',
-                    expired: true
-                };
-            }
             throw new BadRequestException('Bad verification token');
         }
     }

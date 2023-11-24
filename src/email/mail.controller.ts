@@ -3,7 +3,8 @@ import {
     Controller,
     Param,
     Get,
-    Render
+    Render,
+    Query,
 } from '@nestjs/common';
 import { MailService } from './mail.service';
 
@@ -19,5 +20,13 @@ export class MailController {
         const { message, url } = await this.mailService.verifyEmail(token);
 
         return { message, url };
+    }
+
+    @Get('resend-email-verification')
+    @Render('email-verification-response')
+    async resendVerificationLink(@Query('email') email: string): Promise<any> {
+        const message = await this.mailService.resendEmailVerification(email);
+
+        return { message };
     }
 }
