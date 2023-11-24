@@ -11,5 +11,18 @@ export class PrismaService extends PrismaClient {
         },
       },
     });
+
+    this.$use(async (params, next) => {
+      // Check incoming query type
+      if (params.model == 'User') {
+        if (params.action == 'update') {
+          params.args['data'] = {
+            password: params.args.data?.password,
+            changePasswordAt: new Date(Date.now() - 1500)
+          }
+        }
+      }
+      return next(params)
+    })
   }
 }

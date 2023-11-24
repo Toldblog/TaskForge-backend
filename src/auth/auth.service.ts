@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
   BadRequestException,
 } from '@nestjs/common';
-import { SignUpCredentialsDto, SignInDto, JwtPayload } from './dtos/index';
+import { SignUpCredentialsDto, SignInDto, UpdatePasswordDto } from './dtos/index';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -33,18 +33,24 @@ export class AuthService {
   }
 
   private async generateAccessToken(id: number): Promise<string> {
-    const payload: JwtPayload = { id };
+    const payload = { id };
     const accessToken: string = await this.jwtService.signAsync(payload);
 
     return accessToken;
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    return hashedPassword;
   }
 
   async signUp(authCredentialsDto: SignUpCredentialsDto): Promise<any> {
     const { username, email, name, password } = authCredentialsDto;
 
     // Hash password
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await this.hashPassword(password);
 
     try {
       const user = await this.prismaService.user.create({
@@ -61,7 +67,7 @@ export class AuthService {
       const accessToken = await this.generateAccessToken(user.id);
 
       // send email verification
-      await this.mailService.sendUserConfirmation(user);
+      await this.mailService.sendEmailVerification(user);
 
       return {
         user: userRes,
@@ -90,7 +96,39 @@ export class AuthService {
       if (!(await bcrypt.compare(password, user.password))) {
         throw new UnauthorizedException('Wrong password');
       }
+      if (!user.active) {
+        throw new UnauthorizedException('This account is not active');
+      }
 
+      const accessToken = await this.generateAccessToken(user.id);
+      return { accessToken };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updatePassword(id: number, updatePasswordDto: UpdatePasswordDto): Promise<{ accessToken: string }> {
+    const { currentPassword, newPassword } = updatePasswordDto;
+    const user = await this.prismaService.user.findUnique({
+      where: { id }
+    });
+
+    try {
+      // check if POSTed current password is correct
+      if (!await bcrypt.compare(currentPassword, user.password)) {
+        throw new UnauthorizedException('Wrong current password');
+      }
+
+      // update password
+      const hashedNewPassword = await this.hashPassword(newPassword);
+      await this.prismaService.user.update({
+        where: { id },
+        data: {
+          password: hashedNewPassword
+        }
+      });
+      
+      // new access token
       const accessToken = await this.generateAccessToken(user.id);
       return { accessToken };
     } catch (error) {

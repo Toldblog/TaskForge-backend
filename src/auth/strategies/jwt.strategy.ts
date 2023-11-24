@@ -20,13 +20,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
-    const { id } = payload;
+    const { id, iat } = payload;
 
     const user: User = await this.prismaService.user.findUnique({
       where: { id },
     });
+
     if (!user) {
       throw new UnauthorizedException();
+    }
+
+    // check if the password was changed after the token'd been created 
+    if (user.changePasswordAt && iat < parseFloat(user.changePasswordAt.getTime().toString()) / 1000) {
+      throw new UnauthorizedException("Your password has already been changed.");
     }
 
     return user;

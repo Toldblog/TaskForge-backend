@@ -6,7 +6,7 @@ import {
 
 @ValidatorConstraint({ name: 'passwordMatch', async: false })
 export class PasswordMatch implements ValidatorConstraintInterface {
-  validate(value: any, args: ValidationArguments) {
+  validate(value: any, args: ValidationArguments): boolean {
     const { object } = args;
 
     return value === object['password'];
