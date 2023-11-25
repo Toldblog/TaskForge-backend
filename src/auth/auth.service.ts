@@ -23,7 +23,7 @@ export class AuthService {
     authCredentialsDto: AuthCredentialsDto,
   ): Promise<{ accessToken: string }> {
     const { username, email, name, password } = authCredentialsDto;
-    
+
     // Hash password
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -55,8 +55,7 @@ export class AuthService {
   async signIn(authDto: AuthDto): Promise<{ accessToken: string }> {
     const { email, password } = authDto;
 
-    let user: any;
-    user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: { email },
     });
     if (!user) throw new NotFoundException('User not found');
