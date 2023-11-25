@@ -1,17 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { JwtPayload } from '../dtos/jwt-payload.interface';
-import { User } from '@prisma/client';
 
 // Create a custom authentication strategy
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private prismaService: PrismaService,
-    private configService: ConfigService,
+    private readonly prismaService: PrismaService,
+    private readonly configService: ConfigService,
   ) {
     super({
       secretOrKey: configService.get('JWT_SECRET'),
@@ -19,22 +17,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {
-    const { id, iat } = payload;
+  // async validate(payload: JwtPayload) {
+  //   const { id } = payload;
 
-    const user: User = await this.prismaService.user.findUnique({
-      where: { id },
-    });
+  //   const user: User = await this.prismaService.user.findUnique({
+  //     where: { id },
+  //   });
 
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+  //   if (!user) {
+  //     throw new UnauthorizedException();
+  //   }
 
-    // check if the password was changed after the token'd been created 
-    if (user.changePasswordAt && iat < parseFloat(user.changePasswordAt.getTime().toString()) / 1000) {
-      throw new UnauthorizedException("Your password has already been changed.");
-    }
-
-    return user;
-  }
+  //   return user;
+  // }
 }

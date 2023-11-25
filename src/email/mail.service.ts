@@ -30,24 +30,41 @@ export class MailService {
         });
     }
 
+    async sendEmailResetPassword(email: string, resetToken: string): Promise<void> {
+        const url = `${this.configService.get('BASE_URL')}/auth/reset-password/${resetToken}`;
+
+        await this.mailerService.sendMail({
+            to: email,
+            // from: process.env.MAIL_FROM,
+            subject: 'TaskForge: Reset password',
+            template: './reset-password.hbs', // `.hbs` extension is appended automatically
+            context: {
+                url
+            },
+        });
+    }
+
     async verifyEmail(token: string): Promise<any> {
         const { email, expired } = await this.decodeConfirmationToken(token);
+        // Get user by email
+        const user = await this.prismaService.user.findFirst({
+            where: { email }
+        });
+
+        // check if user is active
+        if (user.active) {
+            return {
+                message: 'Email already verified.',
+            };
+        }
+
+        // token is expired -> resend email verification
         if (expired)
             return {
                 message: 'Email verification token expired.',
                 url: `${this.configService.get('BASE_URL')}/mail/resend-email-verification?email=${email}`
             };
 
-        // Get user by email
-        const user = await this.prismaService.user.findFirst({
-            where: { email }
-        });
-
-        if (user.active) {
-            return {
-                message: 'Email already verified.',
-            };
-        }
 
         // let the user be active
         await this.prismaService.user.update({
