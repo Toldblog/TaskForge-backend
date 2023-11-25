@@ -2,14 +2,16 @@ import {
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
-  BadRequestException
+  BadRequestException,
+  NotFoundException
 } from '@nestjs/common';
-import { SignUpCredentialsDto, SignInDto, UpdatePasswordDto } from './dtos/index';
+import { SignUpCredentialsDto, SignInDto, UpdatePasswordDto, ResetPasswordDto } from './dtos/index';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { MailService } from 'src/email/mail.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -22,13 +24,11 @@ export class AuthService {
   private filterUserResponse(user: User) {
     const { username, email, name, bio, avatar } = user;
     return {
-      user: {
-        username,
-        email,
-        name,
-        bio,
-        avatar
-      }
+      username,
+      email,
+      name,
+      bio,
+      avatar
     }
   }
 
@@ -107,7 +107,7 @@ export class AuthService {
     }
   }
 
-  async updatePassword(id: number, updatePasswordDto: UpdatePasswordDto): Promise<{ accessToken: string }> {
+  async updatePassword(id: number, updatePasswordDto: UpdatePasswordDto): Promise<any> {
     const { currentPassword, newPassword } = updatePasswordDto;
     const user = await this.prismaService.user.findUnique({
       where: { id }
@@ -121,16 +121,104 @@ export class AuthService {
 
       // update password
       const hashedNewPassword = await this.hashPassword(newPassword);
-      await this.prismaService.user.update({
+      const updatedUser = await this.prismaService.user.update({
         where: { id },
         data: {
           password: hashedNewPassword
         }
       });
-      
+
       // new access token
       const accessToken = await this.generateAccessToken(user.id);
-      return { accessToken };
+      const userRes = this.filterUserResponse(updatedUser)
+      return {
+        user: userRes,
+        accessToken
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  private createPasswordResetToken(): { resetToken: string, passwordResetToken: string } {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const passwordResetToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
+
+    return { resetToken, passwordResetToken };
+  }
+
+  async forgotPassword(email: string): Promise<any> {
+    try {
+      // get user based on POSTed email
+      const user = await this.prismaService.user.findFirst({
+        where: { email }
+      });
+      if (!user) {
+        throw new NotFoundException('There is no user with email address.');
+      }
+
+      // generate reset token and passwordResetToken
+      const { resetToken, passwordResetToken } = this.createPasswordResetToken();
+
+      // save passwordResetToken
+      await this.prismaService.user.update({
+        where: { email },
+        data: {
+          passwordResetToken,
+          passwordResetExpires: new Date(Date.now() + 10 * 60 * 1000)
+        }
+      });
+
+      // send reset password link to email
+      await this.mailService.sendEmailResetPassword(email, resetToken);
+
+      return { resetToken };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async resetPassword(token: string, resetPasswordDto: ResetPasswordDto): Promise<any> {
+    const { password } = resetPasswordDto;
+
+    try {
+      // get user based on the token
+      const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
+      const user = await this.prismaService.user.findFirst({
+        where: {
+          passwordResetToken: hashedToken,
+          passwordResetExpires: {
+            gte: new Date()
+          }
+        }
+      });
+
+      // if token is not expired -> user, set new password
+      if (!user) {
+        throw new BadRequestException("Reset token is invalid or has expired.");
+      }
+
+      const hashedPassword = await this.hashPassword(password);
+      const updatedUser = await this.prismaService.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          password: hashedPassword,
+          passwordResetToken: null,
+          passwordResetExpires: null,
+        }
+      });
+
+      const userRes = this.filterUserResponse(updatedUser);
+      return { user: userRes };
     } catch (error) {
       throw error;
     }

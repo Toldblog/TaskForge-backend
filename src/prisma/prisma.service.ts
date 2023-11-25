@@ -16,9 +16,11 @@ export class PrismaService extends PrismaClient {
       // Check incoming query type
       if (params.model == 'User') {
         if (params.action == 'update') {
-          params.args['data'] = {
-            password: params.args.data?.password,
-            changePasswordAt: new Date(Date.now() - 1500)
+          if('password' in params.args?.data) {
+            params.args['data'] = {
+              password: params.args.data?.password,
+              changePasswordAt: new Date(Date.now() - 1500)
+            }
           }
         }
       }

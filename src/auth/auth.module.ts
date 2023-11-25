@@ -17,13 +17,13 @@ import { MailModule } from 'src/email/mail.module';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: '2h',
+          expiresIn: configService.get('ACCESS_TOKEN_EXPIRATION_TIME'),
         },
       }),
     })
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  exports: [JwtStrategy, PassportModule, ],
+  exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule { }
