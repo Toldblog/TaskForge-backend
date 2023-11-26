@@ -7,6 +7,8 @@ import { ListsModule } from './lists/lists.module';
 import { UsersModule } from './users/users.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { MailModule } from './email/mail.module';
+import { ConfigModule } from '@nestjs/config';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -17,9 +19,11 @@ import { MailModule } from './email/mail.module';
     ListsModule,
     UsersModule,
     WorkspacesModule,
-    MailModule
+    MailModule,
+    CommonModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

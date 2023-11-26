@@ -11,25 +11,29 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
-import { GetUser } from 'src/users/decorators/get-user.decorator';
-import { UpdateUserDto } from './dtos/update-user.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { UpdateUserDto } from './dtos';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { Role } from 'src/auth/guards/roles.enum';
-import { Roles } from 'src/auth/guards/roles.decorator';
+import { Role, Roles, RolesGuard } from 'src/common/guards';
+import { ResponseInterceptor } from 'src/common/interceptors';
+import { JwtAuthGuard } from 'src/auth/guards';
+import { UtilService } from 'src/common/providers';
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(ResponseInterceptor)
 export class UsersController {
-  constructor(private usersService: UsersService) { }
+  constructor(
+    private usersService: UsersService,
+    private utilService: UtilService
+  ) { }
 
-  @Get('/me')
+  @Get('me')
   getUser(@GetUser() user: User): User {
-    return user;
+    return this.utilService.filterUserResponse(user);
   }
 
-  @Patch('/update-me')
+  @Patch('update-me')
   updateMe(
     @GetUser() user: User,
     @Body() updateUserDto: UpdateUserDto,
@@ -37,7 +41,7 @@ export class UsersController {
     return this.usersService.updateUser(user.id, updateUserDto);
   }
 
-  @Patch('/upload-avatar')
+  @Patch('upload-avatar')
   @UseInterceptors(FileInterceptor('avatar', {}))
   uploadAvatar(
     @GetUser() user: User,
@@ -49,9 +53,9 @@ export class UsersController {
   // delete me
 
   // FOR ADMIN
-  @Delete(':id')
   @Roles(Role.ADMIN)
-  deleteUser(@Param('id') id: string): Promise<void> {
+  @Delete(':id')
+  deleteUser(@Param('id') id: string): Promise<any> {
     return this.usersService.deleteUser(Number(id));
   }
 

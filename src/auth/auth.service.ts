@@ -1,7 +1,6 @@
 import {
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
   UnauthorizedException,
   BadRequestException,
   NotFoundException
@@ -13,6 +12,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { MailService } from 'src/email/mail.service';
 import * as crypto from 'crypto';
+import { UtilService } from 'src/common/providers';
 
 @Injectable()
 export class AuthService {
@@ -20,18 +20,8 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly utilService: UtilService
   ) { }
-
-  private filterUserResponse(user: User): any {
-    const { username, email, name, bio, avatar } = user;
-    return {
-      username,
-      email,
-      name,
-      bio,
-      avatar
-    }
-  }
 
   private async generateAccessToken(id: number): Promise<string> {
     const payload = { id };
@@ -64,7 +54,7 @@ export class AuthService {
         },
       });
 
-      const userRes = this.filterUserResponse(user);
+      const userRes = this.utilService.filterUserResponse(user);
       const accessToken = await this.generateAccessToken(user.id);
 
       // send email verification
@@ -109,7 +99,7 @@ export class AuthService {
   }
 
   async googleLogin(user: User): Promise<{ user: any, havePassword: boolean, accessToken: string }> {
-    const userRes = this.filterUserResponse(user);
+    const userRes = this.utilService.filterUserResponse(user);
     const accessToken = await this.generateAccessToken(user.id);
 
     return {
@@ -142,7 +132,7 @@ export class AuthService {
 
       // new access token
       const accessToken = await this.generateAccessToken(user.id);
-      const userRes = this.filterUserResponse(updatedUser)
+      const userRes = this.utilService.filterUserResponse(updatedUser)
       return {
         user: userRes,
         accessToken
@@ -229,7 +219,7 @@ export class AuthService {
         }
       });
 
-      const userRes = this.filterUserResponse(updatedUser);
+      const userRes = this.utilService.filterUserResponse(updatedUser);
       return { user: userRes };
     } catch (error) {
       throw error;
@@ -255,7 +245,7 @@ export class AuthService {
         }
       });
 
-      const userRes = this.filterUserResponse(updatedUser);
+      const userRes = this.utilService.filterUserResponse(updatedUser);
       return {
         user: userRes,
         accessToken

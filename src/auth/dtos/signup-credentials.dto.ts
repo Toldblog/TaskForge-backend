@@ -7,7 +7,7 @@ import {
   MinLength,
   Validate,
 } from 'class-validator';
-import { PasswordMatch } from '../validators/password-match.validator';
+import { PasswordMatch } from '../validators';
 
 export class SignUpCredentialsDto {
   @IsNotEmpty()

@@ -4,15 +4,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdateUserDto } from './dtos/update-user.dto';
+import { UpdateUserDto } from './dtos';
 import { createClient } from '@supabase/supabase-js';
 import { ConfigService } from '@nestjs/config';
+import { UtilService } from 'src/common/providers';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private configService: ConfigService,
+    private readonly utilService: UtilService
   ) { }
 
   private supabase = createClient(
@@ -40,8 +42,9 @@ export class UsersService {
         where: { id: userId },
         data: updateUserDto,
       });
+      const userRes = this.utilService.filterUserResponse(updatedUser);
 
-      return { user: updatedUser };
+      return { user: userRes };
     } catch (error) {
       throw error;
     }
@@ -68,14 +71,15 @@ export class UsersService {
           avatar: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/avatars/${fileName}`
         }
       });
+      const userRes = this.utilService.filterUserResponse(updatedUser);
 
-      return { user: updatedUser };
+      return { user: userRes };
     } catch (error) {
       throw error;
     }
   }
 
-  async deleteUser(userId: number): Promise<void> {
+  async deleteUser(userId: number): Promise<any> {
     try {
       // check if the user exists
       if (!(await this.prismaService.user.findFirst({ where: { id: userId } }))) {
@@ -88,6 +92,8 @@ export class UsersService {
           id: userId,
         },
       });
+
+      return null;
     } catch (error) {
       throw error;
     }
