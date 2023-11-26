@@ -19,7 +19,10 @@ export class PrismaService extends PrismaClient {
           if('password' in params.args?.data) {
             params.args['data'] = {
               password: params.args.data?.password,
-              changePasswordAt: new Date(Date.now() - 1500)
+              changePasswordAt: new Date(Date.now() - 1500),
+              passwordResetToken: null,
+              passwordResetExpires: null,
+              active: true
             }
           }
         }

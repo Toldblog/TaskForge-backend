@@ -1,0 +1,25 @@
+[
+    {
+        "id": 1,
+        "defaultList": ["TO DO", "IN PROGRESS", "DONE"],
+        "defaultBackground": "https://picsum.photos/200/300"
+    },
+    {
+        "id": 2,
+        "defaultList": [
+            "TO DO",
+            "IN PROGRESS",
+            "DONE"
+        ],
+        "defaultBackground": "https://picsum.photos/200/300"
+    },
+    {
+        "id": 3,
+        "defaultList": [
+            "TO DO",
+            "IN PROGRESS",
+            "DONE"
+        ],
+        "defaultBackground": "https://picsum.photos/200/300"
+    }
+]

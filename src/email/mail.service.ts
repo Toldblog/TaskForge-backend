@@ -15,7 +15,7 @@ export class MailService {
 
     async sendEmailVerification(user: any): Promise<void> {
         const emailToken = await this.createEmailToken(user.email);
-        const url = `${this.configService.get('BASE_URL')}/mail/verify/${emailToken}`;
+        const url = `${this.configService.get('BASE_URL')}/api/mail/verify/${emailToken}`;
 
         await this.mailerService.sendMail({
             to: user.email,
@@ -31,7 +31,7 @@ export class MailService {
     }
 
     async sendEmailResetPassword(email: string, resetToken: string): Promise<void> {
-        const url = `${this.configService.get('BASE_URL')}/auth/reset-password/${resetToken}`;
+        const url = `${this.configService.get('BASE_URL')}/api/auth/reset-password/${resetToken}`;
 
         await this.mailerService.sendMail({
             to: email,
@@ -62,7 +62,7 @@ export class MailService {
         if (expired)
             return {
                 message: 'Email verification token expired.',
-                url: `${this.configService.get('BASE_URL')}/mail/resend-email-verification?email=${email}`
+                url: `${this.configService.get('BASE_URL')}/api/mail/resend-email-verification?email=${email}`
             };
 
 

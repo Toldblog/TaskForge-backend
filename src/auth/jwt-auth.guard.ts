@@ -52,8 +52,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             request['user'] = user;
         } catch (error) {
             if (error?.name === 'JsonWebTokenError') {
-                throw new UnauthorizedException("Token expired or invalid");
-            } else {
+                throw new UnauthorizedException("Token invalid");
+            } else if (error?.name === 'TokenExpiredError') {
+                throw new UnauthorizedException("Token expired");
+            }
+             else {
                 throw error;
             }
         }

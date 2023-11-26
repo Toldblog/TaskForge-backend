@@ -9,9 +9,7 @@ import {
 export class SignInDto {
   @IsNotEmpty()
   @IsString()
-  @MinLength(4)
-  @MaxLength(20)
-  username: string;
+  email: string;
 
   @IsNotEmpty()
   @IsString()

@@ -22,7 +22,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
                     from: `"No Reply" <${process.env.EMAIL_FROM}>`,
                 },
                 template: {
-                    dir: join(__dirname, '../../views'),
+                    dir: join(__dirname, '../..', 'views'),
                     adapter: new HandlebarsAdapter(),
                     options: {
                         strict: true
