@@ -1,10 +1,10 @@
 import { Body, Controller, Post, HttpCode, HttpStatus, UseInterceptors, Patch, UseGuards, Param, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpCredentialsDto, SignInDto, UpdatePasswordDto, ForgotPasswordDto, ResetPasswordDto, GoogleAddPasswordDto } from './dtos/index';
-import { ResponseInterceptor } from 'src/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from 'src/common/interceptors';
 import { User } from '@prisma/client';
 import { GetUser } from './decorators/get-user.decorator';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtAuthGuard } from './guards';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
