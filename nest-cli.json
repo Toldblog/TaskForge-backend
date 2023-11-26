@@ -4,9 +4,12 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "assets": [
-      "email/templates/**/*"
+      {
+        "include": "../views",
+        "outDir": "dist/views",
+        "watchAssets": true
+      }
     ],
-    "watchAssets": true,
-    "deleteOutDir": true
+    "watchAssets": true
   }
 }

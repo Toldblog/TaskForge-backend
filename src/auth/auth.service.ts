@@ -5,12 +5,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  SignUpCredentialsDto,
-  SignInDto,
-  UpdatePasswordDto,
-  ResetPasswordDto,
-} from './dtos/index';
+import { SignUpCredentialsDto, SignInDto, UpdatePasswordDto, ResetPasswordDto, GoogleAddPasswordDto } from './dtos/index';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -24,9 +19,9 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
-  ) {}
+  ) { }
 
-  private filterUserResponse(user: User) {
+  private filterUserResponse(user: User): any {
     const { username, email, name, bio, avatar } = user;
     return {
       username,
@@ -88,15 +83,15 @@ export class AuthService {
   }
 
   async signIn(authDto: SignInDto): Promise<{ accessToken: string }> {
-    const { username, password } = authDto;
+    const { email, password } = authDto;
 
     try {
-      const user = await this.prismaService.user.findUnique({
-        where: { username: username },
+      const user = await this.prismaService.user.findFirst({
+        where: { email },
       });
 
       if (!user) {
-        throw new UnauthorizedException('Username not found');
+        throw new UnauthorizedException('Email not found');
       }
       if (!(await bcrypt.compare(password, user.password))) {
         throw new UnauthorizedException('Wrong password');
@@ -112,10 +107,18 @@ export class AuthService {
     }
   }
 
-  async updatePassword(
-    id: number,
-    updatePasswordDto: UpdatePasswordDto,
-  ): Promise<any> {
+  async googleLogin(user: User): Promise<{ user: any, havePassword: boolean, accessToken: string }> {
+    const userRes = this.filterUserResponse(user);
+    const accessToken = await this.generateAccessToken(user.id);
+
+    return {
+      user: userRes,
+      havePassword: !!user.password,
+      accessToken
+    };
+  }
+
+  async updatePassword(id: number, updatePasswordDto: UpdatePasswordDto): Promise<any> {
     const { currentPassword, newPassword } = updatePasswordDto;
     const user = await this.prismaService.user.findUnique({
       where: { id },
@@ -236,6 +239,35 @@ export class AuthService {
       return { user: userRes };
     } catch (error) {
       throw error;
+    }
+  }
+
+  async googleAddPassword(userId: number, googleAddPassword: GoogleAddPasswordDto): Promise<{ user: any, accessToken: string }> {
+    const { newPassword } = googleAddPassword;
+
+    try {
+      const hashedPassword = await this.hashPassword(newPassword);
+
+      // create accessToken based on user ID
+      const accessToken = await this.generateAccessToken(userId);
+
+      // add new password
+      const updatedUser = await this.prismaService.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          password: hashedPassword
+        }
+      });
+
+      const userRes = this.filterUserResponse(updatedUser);
+      return {
+        user: userRes,
+        accessToken
+      }
+    } catch (error) {
+      throw new InternalServerErrorException("Server error");
     }
   }
 }
