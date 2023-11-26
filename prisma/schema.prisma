@@ -8,9 +8,9 @@ datasource db {
 }
 
 model User {
-  id                   Int               @id @unique @default(autoincrement())
-  username             String            @unique
-  email                String            @unique
+  id                   Int       @id @unique @default(autoincrement())
+  username             String   @unique
+  email                String    @unique
   name                 String
   password             String?
   passwordConfirm      String?
@@ -18,7 +18,7 @@ model User {
   changePasswordAt     DateTime?
   passwordResetToken   String?
   passwordResetExpires DateTime?
-  active               Boolean           @default(false)
+  active               Boolean   @default(false)
   avatar               String?
   role                 Role              @default(USER)
   createdAt            DateTime          @default(now())

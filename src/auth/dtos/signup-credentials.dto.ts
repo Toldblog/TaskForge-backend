@@ -5,12 +5,27 @@ import {
   Matches,
   MaxLength,
   MinLength,
+  Validate,
 } from 'class-validator';
+import { PasswordMatch } from '../validators/password-match.validator';
 
-export class AuthDto {
+export class SignUpCredentialsDto {
   @IsNotEmpty()
+  @IsString()
+  @MinLength(4)
+  @MaxLength(20)
+  username: string;
+
   @IsEmail()
+  @IsNotEmpty()
   email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(4)
+  @MaxLength(20)
+  name: string;
 
   @IsNotEmpty()
   @IsString()
@@ -20,6 +35,13 @@ export class AuthDto {
     message: 'Password is too weak',
   })
   password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  @MaxLength(20)
+  @Validate(PasswordMatch)
+  passwordConfirm: string;
 }
 // Passwords will contain at least 1 upper case letter
 // Passwords will contain at least 1 lower case letter
