@@ -7,62 +7,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 model User {
-  id                   Int       @id @unique @default(autoincrement())
-  username             String    @unique
-  email                String    @unique
+  id                   Int               @id @unique @default(autoincrement())
+  username             String            @unique
+  email                String            @unique
   name                 String
-  password             String
+  password             String?
   passwordConfirm      String?
   bio                  String?
   changePasswordAt     DateTime?
   passwordResetToken   String?
   passwordResetExpires DateTime?
-  active               Boolean   @default(true)
+  active               Boolean           @default(false)
   avatar               String?
-  role                 Role      @default(USER)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  ownWorkspaces    Workspace[]
-  workspaceMembers WorkspaceMember[]
-  boardMembers     BoardMember[]
-  comments         Comment[]
-  cardActivities   CardActivity[]
+  role                 Role              @default(USER)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  boardMembers         BoardMember[]
+  cardActivities       CardActivity[]
+  comments             Comment[]
+  workspaceMembers     WorkspaceMember[]
+  ownWorkspaces        Workspace[]
 
   @@map("users")
 }
 
 model Workspace {
-  id   Int    @id @unique @default(autoincrement())
-  name String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  ownerUserId Int
-  owner       User @relation(fields: [ownerUserId], references: [id])
-
-  workspaceMembers WorkspaceMember[]
+  id               Int               @id @unique @default(autoincrement())
+  name             String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  ownerUserId      Int
   boards           Board[]
+  workspaceMembers WorkspaceMember[]
+  owner            User              @relation(fields: [ownerUserId], references: [id])
 
   @@map("workspaces")
 }
 
 model WorkspaceMember {
   userId      Int
-  user        User      @relation(fields: [userId], references: [id])
   workspaceId Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@id([userId, workspaceId])
   @@map("workspace_member")
@@ -72,92 +61,74 @@ model Template {
   id                Int      @id @unique @default(autoincrement())
   defaultList       String[] @default(["To do", "In progress", "Done"])
   defaultBackground String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  boards Board[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  boards            Board[]
 
   @@map("templates")
 }
 
 model Board {
-  id         Int     @id @unique @default(autoincrement())
-  name       String
-  background String
-  visibility Boolean @default(true) //True: visible in workspace, False: only member in board can see
-  closed     Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  workspaceId Int
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  templateId  Int
-  template    Template  @relation(fields: [templateId], references: [id])
-
+  id           Int           @id @unique @default(autoincrement())
+  name         String
+  background   String
+  visibility   Boolean       @default(true)
+  closed       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  workspaceId  Int
+  templateId   Int
   boardMembers BoardMember[]
+  template     Template      @relation(fields: [templateId], references: [id])
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id])
   lists        List[]
 
   @@map("boards")
 }
 
 model BoardMember {
-  userId  Int
-  user    User  @relation(fields: [userId], references: [id])
-  boardId Int
-  board   Board @relation(fields: [boardId], references: [id])
-
+  userId           Int
+  boardId          Int
   starred          Boolean  @default(false)
   viewRecentlyDate DateTime
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  board            Board    @relation(fields: [boardId], references: [id])
+  user             User     @relation(fields: [userId], references: [id])
 
   @@id([userId, boardId])
   @@map("board_member")
 }
 
 model List {
-  id              Int    @id @unique @default(autoincrement())
+  id              Int      @id @unique @default(autoincrement())
   name            String
   positionInBoard Int
-
-  boardId Int
-  board   Board @relation(fields: [boardId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  cards Card[]
+  boardId         Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  cards           Card[]
+  board           Board    @relation(fields: [boardId], references: [id])
 
   @@map("lists")
 }
 
 model Card {
-  id           Int      @id @unique @default(autoincrement())
-  title        String
-  description  String
-  active       Boolean  @default(true)
-  dueDate      DateTime
-  reminderDate DateTime
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  listId Int
-  list   List @relation(fields: [listId], references: [id])
-
-  cardAttachments CardAttachment[]
-  comments        Comment[]
+  id              Int              @id @unique @default(autoincrement())
+  title           String
+  description     String
+  active          Boolean          @default(true)
+  dueDate         DateTime
+  reminderDate    DateTime
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  listId          Int
   cardActivities  CardActivity[]
+  cardAttachments CardAttachment[]
+  list            List             @relation(fields: [listId], references: [id])
+  comments        Comment[]
 
   @@map("cards")
-}
-
-enum AttachmentType {
-  FILE
-  LINK
 }
 
 model CardAttachment {
@@ -166,42 +137,46 @@ model CardAttachment {
   fileName   String
   url        String
   type       AttachmentType @default(FILE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  cardId Int
-  card   Card @relation(fields: [cardId], references: [id])
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  cardId     Int
+  card       Card           @relation(fields: [cardId], references: [id])
 
   @@map("card_attachment")
 }
 
 model Comment {
-  id      Int    @id @unique @default(autoincrement())
-  content String
-
+  id        Int      @id @unique @default(autoincrement())
+  content   String
   userId    Int
-  commenter User @relation(fields: [userId], references: [id])
   cardId    Int
-  card      Card @relation(fields: [cardId], references: [id])
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  card      Card     @relation(fields: [cardId], references: [id])
+  commenter User     @relation(fields: [userId], references: [id])
 
   @@map("comments")
 }
 
 model CardActivity {
-  id       Int    @id @unique @default(autoincrement())
-  activity String
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-  cardId Int
-  card   Card @relation(fields: [cardId], references: [id])
-
+  id        Int      @id @unique @default(autoincrement())
+  activity  String
+  userId    Int
+  cardId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  card      Card     @relation(fields: [cardId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("card_activity")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AttachmentType {
+  FILE
+  LINK
 }
