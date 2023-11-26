@@ -3,8 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
-  Post,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -15,42 +15,46 @@ import { GetUser } from 'src/users/decorators/get-user.decorator';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Role } from 'src/auth/guards/roles.enum';
+import { Roles } from 'src/auth/guards/roles.decorator';
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService) { }
 
   @Get('/me')
   getUser(@GetUser() user: User): User {
     return user;
   }
 
-  @Patch()
-  async updateUser(
+  @Patch('/update-me')
+  updateMe(
     @GetUser() user: User,
     @Body() updateUserDto: UpdateUserDto,
-  ): Promise<void> {
-    return this.usersService.updateUser(user, updateUserDto);
+  ): Promise<any> {
+    return this.usersService.updateUser(user.id, updateUserDto);
   }
 
-  @Post('/uploadAvatar')
+  @Patch('/upload-avatar')
   @UseInterceptors(FileInterceptor('avatar', {}))
-  async uploadAvatar(
+  uploadAvatar(
     @GetUser() user: User,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.usersService.uploadAvatar(user, file);
+    return this.usersService.uploadAvatar(user.id, file);
   }
 
-  @Get('/getAvatar')
-  async getAvatar(@GetUser() user: User) {
-    return this.usersService.getAvatar(user);
+  // delete me
+
+  // FOR ADMIN
+  @Delete(':id')
+  @Roles(Role.ADMIN)
+  deleteUser(@Param('id') id: string): Promise<void> {
+    return this.usersService.deleteUser(Number(id));
   }
 
-  @Delete()
-  async deleteUser(@GetUser() user: User): Promise<void> {
-    console.log(user);
-    return this.usersService.deleteUser(user);
-  }
+  // get user
+  // get all users
 }
