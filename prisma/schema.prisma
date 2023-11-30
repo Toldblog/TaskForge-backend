@@ -23,7 +23,7 @@ model User {
   changePasswordAt     DateTime?
   passwordResetToken   String?
   passwordResetExpires DateTime?
-  active               Boolean   @default(false)
+  active               Boolean   @default(true)
   avatar               String?
   role                 Role      @default(USER)
 
