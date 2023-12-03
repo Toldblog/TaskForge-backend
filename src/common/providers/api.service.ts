@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class APIService {
-  constructor() {}
+  constructor() { }
 
   getFilterObj(options: any): any {
     const queryObj = { ...options };
 
-    const excludeFields = ['page', 'sort', 'limit', 'fields'];
+    const excludeFields = ['page', 'sort', 'limit', 'fields', 'page', 'limit'];
     excludeFields.forEach((el) => delete queryObj[el]);
 
     const prismaFilter = {};
@@ -29,19 +29,21 @@ export class APIService {
   }
 
   getSortObj(options: any): any {
-    const sortBy = options.sort.split(',');
+    const sortBy = options?.sort?.split(',');
 
-    if (sortBy.length === 1) {
+    if (sortBy && sortBy.length === 1) {
       const [field] = sortBy;
       const direction = field.startsWith('-') ? 'desc' : 'asc';
       const fieldName = field.replace(/^-/, '');
       return { [fieldName]: direction };
-    } else {
+    } else if (sortBy) {
       return sortBy.map((field: string) => {
         const direction = field.startsWith('-') ? 'desc' : 'asc';
         const fieldName = field.replace(/^-/, '');
         return { [fieldName]: direction };
       });
+    } else {
+      return { createdAt: 'asc' };
     }
   }
 
@@ -62,8 +64,19 @@ export class APIService {
       // If no specific fields are mentioned, select all fields except __v and password
       return {
         __v: false,
-        password: false,
+        password: false
       };
+    }
+  }
+
+  getPagination(options: any): { skip: number, take: number } {
+    const page = +options.page || 1;
+    const limit = +options.limit || 100;
+    const skip = (page - 1) * limit;
+
+    return {
+      skip,
+      take: limit
     }
   }
 

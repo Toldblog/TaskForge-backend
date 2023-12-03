@@ -14,7 +14,7 @@ enum Role {
 
 model User {
   id                   Int       @id @unique @default(autoincrement())
-  username             String   @unique
+  username             String    @unique
   email                String    @unique
   name                 String
   password             String?
@@ -23,7 +23,7 @@ model User {
   changePasswordAt     DateTime?
   passwordResetToken   String?
   passwordResetExpires DateTime?
-  active               Boolean   @default(true)
+  active               Boolean   @default(false)
   avatar               String?
   role                 Role      @default(USER)
 

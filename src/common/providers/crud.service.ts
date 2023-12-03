@@ -7,27 +7,32 @@ export class CRUDService {
   constructor(
     private prismaService: PrismaService,
     private apiService: APIService
-    ) {}
+  ) { }
 
   async getAll(model: string, options: any): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
-    const filter = this.apiService.getFilterObj(options);
-    const sortBy = this.apiService.getSortObj(options);
-    const selectedFields = this.apiService.getSelectedFields(options);
-    // console.log(sortBy)
+    let doc = null;
 
-    const doc = await this.prismaService[prismaModel].findMany({
-      where: filter,
-      orderBy: sortBy,
-      select: selectedFields,
-    });
+    if (Object.keys(options).length > 0) {
+      const filter = this.apiService.getFilterObj(options);
+      const sortBy = this.apiService.getSortObj(options);
+      const selectedFields = this.apiService.getSelectedFields(options);
+      const { skip, take } = this.apiService.getPagination(options);
+      
+      doc = await this.prismaService[prismaModel].findMany({
+        where: filter,
+        orderBy: sortBy,
+        select: selectedFields,
+        skip,
+        take
+      });
+    } else {
+      doc = await this.prismaService[prismaModel].findMany({});
+    }
 
     return {
-      status: 'success',
       results: doc.length,
-      data: {
-        data: { [model]: doc },
-      },
+      [model + 's']: doc
     };
   }
 
@@ -43,10 +48,7 @@ export class CRUDService {
     }
 
     return {
-      status: 'success',
-      data: {
-        data: { [model]: doc },
-      },
+      [model]: doc
     };
   }
 
@@ -58,10 +60,7 @@ export class CRUDService {
     });
 
     return {
-      status: 'success',
-      data: {
-        data: { [model]: doc },
-      },
+      [model]: doc
     };
   }
 
@@ -78,10 +77,7 @@ export class CRUDService {
     }
 
     return {
-      status: 'success',
-      data: {
-        data: { [model]: doc },
-      },
+      [model]: doc
     };
   }
 
@@ -97,7 +93,6 @@ export class CRUDService {
     }
 
     return {
-      status: 'success',
       data: null,
     };
   }

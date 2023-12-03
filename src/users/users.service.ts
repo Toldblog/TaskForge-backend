@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dtos';
@@ -97,29 +96,6 @@ export class UsersService {
       return { user: userRes };
     } catch (error) {
       throw error;
-    }
-  }
-
-  async deleteUser(userId: number): Promise<any> {
-    try {
-      // check if the user exists
-      if (
-        !(await this.prismaService.user.findFirst({ where: { id: userId } }))
-      ) {
-        throw new NotFoundException('User ID not found');
-      }
-
-      // delete user
-      await this.prismaService.user.delete({
-        where: {
-          id: userId,
-        },
-      });
-
-      return null;
-    } catch (error) {
-      console.log(error);
-      throw new NotFoundException('User not found');
     }
   }
 }
