@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
   BadRequestException,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { SignUpCredentialsDto, SignInDto, UpdatePasswordDto, ResetPasswordDto, GoogleAddPasswordDto } from './dtos/index';
 import * as bcrypt from 'bcrypt';
@@ -50,7 +50,7 @@ export class AuthService {
           email,
           name,
           password: hashedPassword,
-          passwordConfirm: ''
+          passwordConfirm: '',
         },
       });
 
@@ -62,7 +62,7 @@ export class AuthService {
 
       return {
         user: userRes,
-        accessToken
+        accessToken,
       };
     } catch (error) {
       if (error.code === 'P2002') {
@@ -84,7 +84,7 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException('Email not found');
       }
-      if (!await bcrypt.compare(password, user.password)) {
+      if (!(await bcrypt.compare(password, user.password))) {
         throw new UnauthorizedException('Wrong password');
       }
       if (!user.active) {
@@ -112,12 +112,12 @@ export class AuthService {
   async updatePassword(id: number, updatePasswordDto: UpdatePasswordDto): Promise<any> {
     const { currentPassword, newPassword } = updatePasswordDto;
     const user = await this.prismaService.user.findUnique({
-      where: { id }
+      where: { id },
     });
 
     try {
       // check if POSTed current password is correct
-      if (!await bcrypt.compare(currentPassword, user.password)) {
+      if (!(await bcrypt.compare(currentPassword, user.password))) {
         throw new UnauthorizedException('Wrong current password');
       }
 
@@ -126,8 +126,8 @@ export class AuthService {
       const updatedUser = await this.prismaService.user.update({
         where: { id },
         data: {
-          password: hashedNewPassword
-        }
+          password: hashedNewPassword,
+        },
       });
 
       // new access token
@@ -135,14 +135,17 @@ export class AuthService {
       const userRes = this.utilService.filterUserResponse(updatedUser)
       return {
         user: userRes,
-        accessToken
+        accessToken,
       };
     } catch (error) {
       throw error;
     }
   }
 
-  private createPasswordResetToken(): { resetToken: string, passwordResetToken: string } {
+  private createPasswordResetToken(): {
+    resetToken: string;
+    passwordResetToken: string;
+  } {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const passwordResetToken = crypto
       .createHash('sha256')
@@ -156,22 +159,23 @@ export class AuthService {
     try {
       // get user based on POSTed email
       const user = await this.prismaService.user.findFirst({
-        where: { email }
+        where: { email },
       });
       if (!user) {
         throw new NotFoundException('There is no user with email address.');
       }
 
       // generate reset token and passwordResetToken
-      const { resetToken, passwordResetToken } = this.createPasswordResetToken();
+      const { resetToken, passwordResetToken } =
+        this.createPasswordResetToken();
 
       // save passwordResetToken
       await this.prismaService.user.update({
         where: { email },
         data: {
           passwordResetToken,
-          passwordResetExpires: new Date(Date.now() + 10 * 60 * 1000)
-        }
+          passwordResetExpires: new Date(Date.now() + 10 * 60 * 1000),
+        },
       });
 
       // send reset password link to email
@@ -183,7 +187,10 @@ export class AuthService {
     }
   }
 
-  async resetPassword(token: string, resetPasswordDto: ResetPasswordDto): Promise<any> {
+  async resetPassword(
+    token: string,
+    resetPasswordDto: ResetPasswordDto,
+  ): Promise<any> {
     const { password } = resetPasswordDto;
 
     try {
@@ -197,26 +204,26 @@ export class AuthService {
         where: {
           passwordResetToken: hashedToken,
           passwordResetExpires: {
-            gte: new Date()
-          }
-        }
+            gte: new Date(),
+          },
+        },
       });
 
       // if token is not expired -> user, set new password
       if (!user) {
-        throw new BadRequestException("Reset token is invalid or has expired.");
+        throw new BadRequestException('Reset token is invalid or has expired.');
       }
 
       const hashedPassword = await this.hashPassword(password);
       const updatedUser = await this.prismaService.user.update({
         where: {
-          id: user.id
+          id: user.id,
         },
         data: {
           password: hashedPassword,
           passwordResetToken: null,
           passwordResetExpires: null,
-        }
+        },
       });
 
       const userRes = this.utilService.filterUserResponse(updatedUser);

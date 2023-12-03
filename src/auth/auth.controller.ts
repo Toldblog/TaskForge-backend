@@ -18,22 +18,21 @@ export class AuthController {
     @Body()
     authCredentialsDto: SignUpCredentialsDto,
   ): Promise<any> {
-    return this.authService.signUp(
-      authCredentialsDto,
-    );
+    return this.authService.signUp(authCredentialsDto);
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  signIn(
-    @Body() authDto: SignInDto,
-  ): Promise<any> {
+  signIn(@Body() authDto: SignInDto): Promise<any> {
     return this.authService.signIn(authDto);
   }
 
   @Patch('update-password')
   @UseGuards(JwtAuthGuard)
-  updatePassword(@GetUser() user: User, @Body() updatePasswordDto: UpdatePasswordDto): Promise<any> {
+  updatePassword(
+    @GetUser() user: User,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ): Promise<any> {
     return this.authService.updatePassword(user.id, updatePasswordDto);
   }
 
@@ -43,7 +42,10 @@ export class AuthController {
   }
 
   @Patch('reset-password/:token')
-  resetPassword(@Param('token') token: string, @Body() resetPasswordDto: ResetPasswordDto): Promise<any> {
+  resetPassword(
+    @Param('token') token: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<any> {
     return this.authService.resetPassword(token, resetPasswordDto);
   }
 

@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dtos';
@@ -14,28 +13,33 @@ export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
     private configService: ConfigService,
-    private readonly utilService: UtilService
-  ) { }
+    private readonly utilService: UtilService,
+  ) {}
 
   private supabase = createClient(
     this.configService.get('SUPABASE_URL'),
     this.configService.get('SUPABASE_API_KEY'),
   );
 
-  async updateUser(userId: number, updateUserDto: UpdateUserDto): Promise<{ user: any }> {
+  async updateMe(
+    userId: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<{ user: any }> {
     const { username } = updateUserDto;
 
     try {
       // check if the changed username already exists in database
-      if (await this.prismaService.user.findFirst({
-        where: {
-          id: {
-            not: userId
+      if (
+        await this.prismaService.user.findFirst({
+          where: {
+            id: {
+              not: userId,
+            },
+            username,
           },
-          username
-        }
-      })) {
-        throw new BadRequestException("Username already exists")
+        })
+      ) {
+        throw new BadRequestException('Username already exists');
       }
 
       const updatedUser = await this.prismaService.user.update({
@@ -50,7 +54,21 @@ export class UsersService {
     }
   }
 
-  async uploadAvatar(userId: number, file: Express.Multer.File): Promise<{ user: any }> {
+  async deleteMe(userId: number): Promise<any> {
+    try {
+      await this.prismaService.user.update({
+        where: { id: userId },
+        data: { active: false },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async uploadAvatar(
+    userId: number,
+    file: Express.Multer.File,
+  ): Promise<{ user: any }> {
     try {
       // create random file name
       const fileName = `avatar-${userId}-${Date.now()}`;
@@ -68,32 +86,14 @@ export class UsersService {
       const updatedUser = await this.prismaService.user.update({
         where: { id: userId },
         data: {
-          avatar: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/avatars/${fileName}`
-        }
+          avatar: `${this.configService.get(
+            'SUPABASE_URL',
+          )}/storage/v1/object/public/avatars/${fileName}`,
+        },
       });
       const userRes = this.utilService.filterUserResponse(updatedUser);
 
       return { user: userRes };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async deleteUser(userId: number): Promise<any> {
-    try {
-      // check if the user exists
-      if (!(await this.prismaService.user.findFirst({ where: { id: userId } }))) {
-        throw new NotFoundException("User ID not found");
-      }
-
-      // delete user
-      await this.prismaService.user.delete({
-        where: {
-          id: userId,
-        },
-      });
-
-      return null;
     } catch (error) {
       throw error;
     }
