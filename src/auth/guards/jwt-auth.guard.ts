@@ -12,8 +12,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
     constructor(
-        private jwtService: JwtService,
-        private configService: ConfigService,
+        private readonly jwtService: JwtService,
+        private readonly configService: ConfigService,
         private readonly prismaService: PrismaService,
     ) {
         super();
@@ -25,6 +25,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         if (!token) {
             throw new UnauthorizedException();
         }
+
         try {
             const payload = await this.jwtService.verifyAsync(
                 token,

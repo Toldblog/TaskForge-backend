@@ -1,4 +1,80 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { UtilService } from 'src/common/providers';
+import { AppGateway } from 'src/gateway/app.gateway';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class CommentsService {}
+export class CommentsService {
+    constructor(
+        private readonly prismaService: PrismaService,
+        private readonly utilService: UtilService,
+        private readonly appGateway: AppGateway
+    ) { }
+
+    async commentOnCard(userId: number, userName: string, cardId: number, content: string): Promise<any> {
+        try {
+            // Check card
+            const card = await this.prismaService.card.findUnique({
+                where: { id: cardId }
+            });
+            if (!card) {
+                throw new NotFoundException('Card not found');
+            }
+
+            // Check if user is in board
+            const list = await this.prismaService.list.findUnique({
+                where: { id: card.listId }
+            });
+            const checkUser = await this.prismaService.boardMember.findUnique({
+                where: {
+                    userId_boardId: {
+                        userId,
+                        boardId: list.boardId
+                    }
+                }
+            });
+
+            if (!checkUser) {
+                throw new ForbiddenException("You are not a member of the board");
+            }
+
+            // Add comment
+            const comment = await this.prismaService.comment.create({
+                data: {
+                    userId,
+                    cardId,
+                    content
+                }
+            });
+
+            // Find all userIDs assigned to the card
+            const cardAssignees = await this.prismaService.cardAssignee.findMany({
+                where: { cardId }
+            });
+            const assigneeIds = cardAssignees
+                .map(item => item.assigneeId)
+                .filter(id => id !== userId);
+            assigneeIds?.forEach(async (assigneeId) => {
+                // add new notification
+                await this.prismaService.notification.create({
+                    data: {
+                        type: 'COMMENT',
+                        senderId: userId,
+                        receiverId: assigneeId,
+                        cardId
+                    }
+                });
+                this.appGateway.server.emit(`comment-${assigneeId}`, {
+                    commentatorName: userName,
+                    cardTitle: card.title
+                });
+            });
+
+            return {
+                comment: this.utilService.filterResponse(comment)
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+}

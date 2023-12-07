@@ -3,15 +3,20 @@ import { User } from '@prisma/client';
 
 @Injectable()
 export class UtilService {
+  public filterResponse(response: any): any {
+    delete response?.createdAt, response?.updatedAt;
+    return response
+  }
+
   public filterUserResponse(user: User): any {
-    const { username, email, name, bio, avatar } = user;
-    return {
-      username,
-      email,
-      name,
-      bio,
-      avatar,
-    };
+    const response = this.filterResponse(user);
+    delete response.password,
+      response.passwordConfirm,
+      response.passwordResetExpires,
+      response.passwordResetToken,
+      response.changePasswordAt;
+
+    return response;
   }
 }
 

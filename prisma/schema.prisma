@@ -30,11 +30,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ownWorkspaces    Workspace[]
-  workspaceMembers WorkspaceMember[]
-  boardMembers     BoardMember[]
-  comments         Comment[]
-  cardActivities   CardActivity[]
+  workspaceMembers     WorkspaceMember[]
+  boardMembers         BoardMember[]
+  comments             Comment[]
+  cardActivities       CardActivity[]
+  sendNotifications    Notification[]    @relation("send_notification")
+  receiveNotifications Notification[]    @relation("receive_notification")
+  cardAssignees        CardAssignee[]
 
   @@map("users")
 }
@@ -46,11 +48,11 @@ model Workspace {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ownerUserId Int
-  owner       User @relation(fields: [ownerUserId], references: [id])
+  ownerUserIds Int[]
 
   workspaceMembers WorkspaceMember[]
   boards           Board[]
+  notifications    Notification[]
 
   @@map("workspaces")
 }
@@ -135,12 +137,12 @@ model List {
 }
 
 model Card {
-  id           Int      @id @unique @default(autoincrement())
+  id           Int       @id @unique @default(autoincrement())
   title        String
-  description  String
-  active       Boolean  @default(true)
-  dueDate      DateTime
-  reminderDate DateTime
+  description  String?
+  active       Boolean   @default(true)
+  dueDate      DateTime?
+  reminderDate DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,8 +153,23 @@ model Card {
   cardAttachments CardAttachment[]
   comments        Comment[]
   cardActivities  CardActivity[]
+  notifications   Notification[]
+  cardAssignees   CardAssignee[]
 
   @@map("cards")
+}
+
+model CardAssignee {
+  assigneeId Int
+  assignee   User @relation(fields: [assigneeId], references: [id])
+  cardId     Int
+  card       Card @relation(fields: [cardId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([assigneeId, cardId])
+  @@map("card_assignee")
 }
 
 enum AttachmentType {
@@ -204,4 +221,30 @@ model CardActivity {
   updatedAt DateTime @updatedAt
 
   @@map("card_activity")
+}
+
+enum NotificationType {
+  ADD_ADMIN
+  REMOVE
+  ASSIGNMENT
+  COMMENT
+}
+
+model Notification {
+  id   Int              @id @unique @default(autoincrement())
+  type NotificationType @default(ASSIGNMENT)
+
+  senderId    Int
+  sender      User       @relation(name: "send_notification", fields: [senderId], references: [id])
+  receiverId  Int
+  receiver    User       @relation(name: "receive_notification", fields: [receiverId], references: [id])
+  workspaceId Int?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
+  cardId      Int?
+  card        Card?      @relation(fields: [cardId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notifications")
 }

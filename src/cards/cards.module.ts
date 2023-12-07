@@ -1,11 +1,13 @@
-// import { Module } from '@nestjs/common';
-// import { CardsController } from './cards.controller';
-// import { CardsService } from './cards.service';
-// import { AuthModule } from 'src/auth/auth.module';
+import { Module } from '@nestjs/common';
+import { CardsController } from './cards.controller';
+import { CardsService } from './cards.service';
+import { GatewayModule } from 'src/gateway/gateway.module';
+import { JwtModule } from '@nestjs/jwt';
+import { AppGateway } from 'src/gateway/app.gateway';
 
-// @Module({
-//   imports: [AuthModule],
-//   controllers: [CardsController],
-//   providers: [CardsService],
-// })
-// export class CardsModule {}
+@Module({
+    imports: [GatewayModule, JwtModule],
+    controllers: [CardsController],
+    providers: [CardsService, AppGateway],
+})
+export class CardsModule { }
