@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { UtilService } from 'src/common/providers';
 import { AppGateway } from 'src/gateway/app.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,19 +11,14 @@ export class WorkspacesService {
         private readonly appGateway: AppGateway
     ) { }
 
-    async removeWorkspaceMember(ownerId: number, ownerName: string, workspaceId: number, userId: number): Promise<any> {
+    async removeWorkspaceMember(
+        ownerId: number, ownerName: string,
+        workspaceId: number, userId: number
+    ): Promise<any> {
         try {
             const workspace = await this.prismaService.workspace.findUnique({
                 where: { id: workspaceId }
             });
-
-            if (!workspace) {
-                throw new NotFoundException('Workspace not found');
-            }
-            // Check the owner of workspace
-            if (!workspace.ownerUserIds.includes(ownerId)) {
-                throw new ForbiddenException('You are not the administrator of a workspace')
-            }
 
             // remove the user out of workspace
             await this.prismaService.workspaceMember.delete({
@@ -34,11 +29,11 @@ export class WorkspacesService {
                     }
                 }
             });
-            if(workspace.ownerUserIds.includes(userId)) {
+            if (workspace.adminIds.includes(userId)) {
                 await this.prismaService.workspace.update({
                     where: { id: workspaceId },
                     data: {
-                        ownerUserIds: workspace.ownerUserIds.filter(id => id !== userId)
+                        adminIds: workspace.adminIds.filter(id => id !== userId)
                     }
                 });
             }
@@ -54,7 +49,7 @@ export class WorkspacesService {
             });
 
             this.appGateway.server.emit(`removeWorkspaceMember-${userId}`, {
-                ownerName: ownerName,
+                adminName: ownerName,
                 workspaceName: workspace.name
             });
         } catch (error) {
@@ -62,19 +57,16 @@ export class WorkspacesService {
         }
     }
 
-    async addAdminToWorkspace(ownerId: number, ownerName: string, workspaceId: number, userId: number): Promise<any> {
+    async addAdminToWorkspace(
+        ownerId: number, ownerName: string,
+        workspaceId: number, userId: number
+    ): Promise<any> {
         try {
             const workspace = await this.prismaService.workspace.findUnique({
                 where: { id: workspaceId }
             });
 
-            if (!workspace) {
-                throw new NotFoundException('Workspace not found');
-            }
-            if (!workspace.ownerUserIds.includes(ownerId)) {
-                throw new ForbiddenException('You are not the administrator of a workspace')
-            }
-            if (workspace.ownerUserIds.includes(userId)) {
+            if (workspace.adminIds.includes(userId)) {
                 throw new BadRequestException('The user is already an admin of the workspace')
             }
 
@@ -87,7 +79,7 @@ export class WorkspacesService {
                     }
                 }
             });
-            if(!workspaceMember) {
+            if (!workspaceMember) {
                 throw new BadRequestException('The user is not a member of the workspace')
             }
 
@@ -95,7 +87,7 @@ export class WorkspacesService {
             const updatedWorkspace = await this.prismaService.workspace.update({
                 where: { id: workspaceId },
                 data: {
-                    ownerUserIds: [...workspace.ownerUserIds, userId]
+                    adminIds: [...workspace.adminIds, userId]
                 }
             });
             // add new notification
@@ -109,8 +101,9 @@ export class WorkspacesService {
             });
 
             this.appGateway.server.emit(`addAdmin-${userId}`, {
-                ownerName: ownerName,
-                workspaceName: workspace.name
+                adminName: ownerName,
+                workspaceName: workspace.name,
+                workspaceId: workspace.id
             });
 
             return {

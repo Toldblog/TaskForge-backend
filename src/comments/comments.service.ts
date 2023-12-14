@@ -22,18 +22,18 @@ export class CommentsService {
             }
 
             // Check if user is in board
-            const list = await this.prismaService.list.findUnique({
-                where: { id: card.listId }
-            });
-            const checkUser = await this.prismaService.boardMember.findUnique({
+            const checkUser = await this.prismaService.boardMember.findFirst({
                 where: {
-                    userId_boardId: {
-                        userId,
-                        boardId: list.boardId
+                    user: { id: userId },
+                    board: {
+                        lists: {
+                            some: {
+                                id: card.listId
+                            }
+                        }
                     }
                 }
             });
-
             if (!checkUser) {
                 throw new ForbiddenException("You are not a member of the board");
             }
@@ -66,7 +66,8 @@ export class CommentsService {
                 });
                 this.appGateway.server.emit(`comment-${assigneeId}`, {
                     commentatorName: userName,
-                    cardTitle: card.title
+                    cardTitle: card.title,
+                    cardId
                 });
             });
 

@@ -3,7 +3,7 @@ import { WorkspacesService } from './workspaces.service';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards';
-import { RolesGuard } from 'src/common/guards';
+import { RolesGuard, WorkspaceGuard } from 'src/common/guards';
 import { ResponseInterceptor } from 'src/common/interceptors';
 
 @Controller('workspaces')
@@ -13,6 +13,7 @@ export class WorkspacesController {
     constructor(private workspaceService: WorkspacesService) { }
 
     @Delete(':workspaceId/remove-workspace-member/:userId')
+    @UseGuards(WorkspaceGuard)
     removeWorkspaceMember(
         @GetUser() owner: User,
         @Param('workspaceId', ParseIntPipe) workspaceId: number,
@@ -22,6 +23,7 @@ export class WorkspacesController {
     }
 
     @Post(':workspaceId/add-admin/:userId')
+    @UseGuards(WorkspaceGuard)
     addAdmin(
         @GetUser() owner: User,
         @Param('workspaceId', ParseIntPipe) workspaceId: number,

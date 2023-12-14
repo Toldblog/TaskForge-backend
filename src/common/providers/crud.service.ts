@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { APIService } from './api.service';
+import { UtilService } from './util.service';
 
 @Injectable()
 export class CRUDService {
   constructor(
     private prismaService: PrismaService,
-    private apiService: APIService
+    private apiService: APIService,
+    private utilService: UtilService,
   ) { }
 
   async getAll(model: string, options: any): Promise<any> {
@@ -32,7 +34,7 @@ export class CRUDService {
 
     return {
       results: doc.length,
-      [model + 's']: doc
+      [model + 's']: doc.map(item => this.utilService.filterResponse(item))
     };
   }
 
@@ -48,7 +50,7 @@ export class CRUDService {
     }
 
     return {
-      [model]: doc
+      [model]: this.utilService.filterResponse(doc)
     };
   }
 
@@ -60,7 +62,7 @@ export class CRUDService {
     });
 
     return {
-      [model]: doc
+      [model]: this.utilService.filterResponse(doc)
     };
   }
 
@@ -77,7 +79,7 @@ export class CRUDService {
     }
 
     return {
-      [model]: doc
+      [model]: this.utilService.filterResponse(doc)
     };
   }
 

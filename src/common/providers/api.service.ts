@@ -81,6 +81,6 @@ export class APIService {
   }
 
   getModel(model: string): string {
-    return model.toLowerCase();
+    return model[0].toLowerCase() + model.slice(1);
   }
 }

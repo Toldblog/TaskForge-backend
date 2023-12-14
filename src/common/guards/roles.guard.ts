@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
@@ -12,7 +12,8 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (!user || !user.role || !roles.includes(user.role.toLowerCase())) return false; // User doesn't have required role
+    if (!user || !user.role || !roles.includes(user.role.toLowerCase())) 
+      throw new ForbiddenException('This route is for Admin'); // User doesn't have required role
 
     return true; // User has required role, allow access
   }

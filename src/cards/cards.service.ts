@@ -49,7 +49,7 @@ export class CardsService {
         throw new ForbiddenException('The assigner is not a member of the board.');
       }
 
-      // add assigner to card
+      // add assignee to card
       await this.prismaService.cardAssignee.create({
         data: {
           assigneeId: userId,
@@ -68,7 +68,8 @@ export class CardsService {
       });
       this.appGateway.server.emit(`assignCard-${userId}`, {
         assigner: assignerName,
-        cardTitle: card.title
+        cardTitle: card.title,
+        cardId: card.id
       });
     } catch (error) {
       throw error;
