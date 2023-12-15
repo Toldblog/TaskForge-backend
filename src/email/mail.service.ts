@@ -2,6 +2,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { Workspace } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -118,5 +119,21 @@ export class MailService {
         const emailToken = this.jwtService.signAsync({ email });
 
         return emailToken;
+    }
+
+    async sendWorkspaceInvitation(email: string, senderName: string, workspace: Workspace): Promise<void> {
+        const url = `https://frontend-domain.com/workspace/${workspace.id}`;
+
+        await this.mailerService.sendMail({
+            to: email,
+            // from: process.env.MAIL_FROM,
+            subject: 'Invite to workspace',
+            template: './workspace-invitation.hbs', // `.hbs` extension is appended automatically
+            context: {
+                senderName,
+                workspaceName: workspace.name,
+                url,
+            },
+        });
     }
 }

@@ -17,7 +17,14 @@ export class BoardsService {
         try {
             const board = await this.prismaService.board.findUnique({
                 where: { id },
-                include: { lists: true, boardMembers: true }
+                include: {
+                    lists: {
+                        include: {
+                            cards: true
+                        }
+                    },
+                    boardMembers: true
+                }
             });
 
             return {
@@ -30,22 +37,26 @@ export class BoardsService {
 
     async createBoard(userId: number, body: CreateBoardDto): Promise<any> {
         try {
-            const hash = crypto.createHash('sha256');
-            const inviteToken = hash.update(body.name).digest('hex');
             const template = await this.prismaService.template.findUnique({
                 where: { id: body.templateId }
             });
-
             if (!template) {
                 throw new NotFoundException("Template not found");
             }
-            const board = await this.prismaService.board.create({
+
+            let board = await this.prismaService.board.create({
                 data: {
                     ...body,
                     background: template.defaultBackground,
                     creatorId: userId,
-                    inviteToken
                 }
+            });
+            // add invite token to the created board
+            const hash = crypto.createHash('sha256');
+            const inviteToken = hash.update(String(board.id)).digest('hex');
+            board = await this.prismaService.board.update({
+                where: { id: board.id },
+                data: { inviteToken }
             });
 
             // create default list
@@ -177,22 +188,41 @@ export class BoardsService {
         }
     }
 
-    async joinBoardByLink(userId: number, token: string): Promise<any> {
+    async acceptInvitationLink(userId: number, token: string): Promise<any> {
         try {
             const board = await this.prismaService.board.findFirst({
                 where: { inviteToken: token }
             });
-
             if (!board) {
                 throw new NotFoundException("Board is not found");
             }
 
-            // add new row to the BoardMember model
-            await this.prismaService.boardMember.create({
-                data: {
+            const workspaceMember = await this.prismaService.workspaceMember.findFirst({
+                where: {
+                    user: {
+                        id: userId
+                    },
+                    workspace: {
+                        boards: {
+                            some: {
+                                id: board.id
+                            }
+                        }
+                    }
+                }
+            });
+            if (!workspaceMember) {
+                throw new NotFoundException('You should be a member of the workspace');
+            }
+
+            // add new record to the BoardMember model
+            await this.prismaService.boardMember.upsert({
+                where: { userId_boardId: { userId, boardId: board.id } },
+                create: {
                     userId,
                     boardId: board.id
-                }
+                },
+                update: {}
             });
 
             return {

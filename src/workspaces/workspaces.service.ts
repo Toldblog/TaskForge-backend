@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { UtilService } from 'src/common/providers';
 import { AppGateway } from 'src/gateway/app.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,8 +11,68 @@ export class WorkspacesService {
         private readonly appGateway: AppGateway
     ) { }
 
+    async acceptInvitationLink(userId: number, token: string): Promise<any> {
+        try {
+            const workspace = await this.prismaService.workspace.findFirst({
+                where: { inviteToken: token },
+                include: { boards: true }
+            });
+            if (!workspace) {
+                throw new NotFoundException('Workspace not found');
+            }
+
+            // add new record to the BoardMember model if not exists
+            await this.prismaService.workspaceMember.upsert({
+                where: { userId_workspaceId: { userId, workspaceId: workspace.id } },
+                create: {
+                    userId,
+                    workspaceId: workspace.id
+                },
+                update: {}
+            });
+
+            return {
+                Workspace: this.utilService.filterResponse(workspace)
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async leaveWorkspace(userId: number, workspaceId: number): Promise<any> {
+        try {
+            // check if the workspace has any admin after leaving
+            const workspace = await this.prismaService.workspace.findUnique({
+                where: { id: workspaceId }
+            });
+            const workspaceMember = await this.prismaService.workspaceMember.findMany({
+                where: {
+                    workspaceId
+                }
+            });
+
+            if (workspaceMember.length == 1) {
+                throw new BadRequestException("Can not leave this workspace");
+            } else if (workspace.adminIds.length == 1 && workspace.adminIds[0] === userId) {
+                throw new BadRequestException("You should allow other workspace members to be a administrator before leaving.");
+            }
+
+            await this.prismaService.workspaceMember.delete({
+                where: {
+                    userId_workspaceId: {
+                        userId, workspaceId
+                    }
+                }
+            });
+
+            return null;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async removeWorkspaceMember(
-        ownerId: number, ownerName: string,
+        adminId: number, adminName: string,
         workspaceId: number, userId: number
     ): Promise<any> {
         try {
@@ -42,14 +102,14 @@ export class WorkspacesService {
             await this.prismaService.notification.create({
                 data: {
                     type: 'REMOVE',
-                    senderId: ownerId,
+                    senderId: adminId,
                     receiverId: userId,
                     workspaceId
                 }
             });
 
             this.appGateway.server.emit(`removeWorkspaceMember-${userId}`, {
-                adminName: ownerName,
+                adminName: adminName,
                 workspaceName: workspace.name
             });
         } catch (error) {
@@ -58,7 +118,7 @@ export class WorkspacesService {
     }
 
     async addAdminToWorkspace(
-        ownerId: number, ownerName: string,
+        adminId: number, adminName: string,
         workspaceId: number, userId: number
     ): Promise<any> {
         try {
@@ -94,14 +154,14 @@ export class WorkspacesService {
             await this.prismaService.notification.create({
                 data: {
                     type: 'ADD_ADMIN',
-                    senderId: ownerId,
+                    senderId: adminId,
                     receiverId: userId,
                     workspaceId
                 }
             });
 
             this.appGateway.server.emit(`addAdmin-${userId}`, {
-                adminName: ownerName,
+                adminName: adminName,
                 workspaceName: workspace.name,
                 workspaceId: workspace.id
             });
@@ -109,6 +169,41 @@ export class WorkspacesService {
             return {
                 workspace: this.utilService.filterResponse(updatedWorkspace)
             };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getWorkspaceMembers(workspaceId: number, search: string): Promise<any> {
+        try {
+            let users = await this.prismaService.user.findMany({
+                where: {
+                    workspaceMembers: {
+                        some: {
+                            workspaceId
+                        }
+                    },
+                    OR: [
+                        {
+                            name: {
+                                mode: 'insensitive',
+                                contains: search
+                            }
+                        },
+                        {
+                            email: {
+                                mode: 'insensitive',
+                                contains: search
+                            }
+                        }
+                    ]
+                }
+            });
+            users = users.map(user => this.utilService.filterUserResponse(user));
+
+            return {
+                Users: users
+            }
         } catch (error) {
             throw error;
         }

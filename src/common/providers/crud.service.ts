@@ -20,7 +20,7 @@ export class CRUDService {
       const sortBy = this.apiService.getSortObj(options);
       const selectedFields = this.apiService.getSelectedFields(options);
       const { skip, take } = this.apiService.getPagination(options);
-      
+
       doc = await this.prismaService[prismaModel].findMany({
         where: filter,
         orderBy: sortBy,
@@ -34,16 +34,23 @@ export class CRUDService {
 
     return {
       results: doc.length,
-      [model + 's']: doc.map(item => this.utilService.filterResponse(item))
+      [model + 's']: doc.map((item) => this.utilService.filterResponse(item))
     };
   }
 
-  async getOne(model: string, id: string): Promise<any> {
+  async getOne(model: string, id: string, include: object = null): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
-
-    const doc = await this.prismaService[prismaModel].findUnique({
-      where: { id: parseInt(id, 10) },
-    });
+    let doc = null;
+    if (include) {
+      doc = await this.prismaService[prismaModel].findUnique({
+        where: { id: Number(id) },
+        include: include
+      });
+    } else {
+      doc = await this.prismaService[prismaModel].findUnique({
+        where: { id: Number(id) }
+      });
+    }
 
     if (!doc) {
       throw new NotFoundException(`No document found with ID: ${id}`);
@@ -66,13 +73,22 @@ export class CRUDService {
     };
   }
 
-  async updateOne(model: string, id: string, body: any): Promise<any> {
+  async updateOne(model: string, id: string, body: any, include: object = null): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
+    let doc = null;
 
-    const doc = await this.prismaService[prismaModel].update({
-      where: { id: parseInt(id, 10) },
-      data: body,
-    });
+    if(include) {
+      doc = await this.prismaService[prismaModel].update({
+        where: { id: Number(id) },
+        data: body,
+        include: include
+      });
+    } else {
+      doc = await this.prismaService[prismaModel].update({
+        where: { id: Number(id) },
+        data: body,
+      });
+    }
 
     if (!doc) {
       throw new NotFoundException(`No document found with ID: ${id}`);
@@ -87,7 +103,7 @@ export class CRUDService {
     const prismaModel = this.apiService.getModel(model);
 
     const doc = await this.prismaService[prismaModel].delete({
-      where: { id: parseInt(id, 10) },
+      where: { id: Number(id) },
     });
 
     if (!doc) {

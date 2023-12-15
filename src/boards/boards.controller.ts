@@ -44,7 +44,13 @@ export class BoardsController {
     @UseGuards(BoardGuard)
     async updateBoard(@Param('id') id: string, @Body() body: UpdateBoardDto): Promise<any> {
         try {
-            const result = await this.crudService.updateOne('Board', id, body);
+            const result = await this.crudService.updateOne('Board', id, body, {
+                lists: {
+                    include: {
+                        cards: true
+                    }
+                }
+            });
             return result;
         } catch (error) {
             throw error;
@@ -86,8 +92,8 @@ export class BoardsController {
         return this.boardService.starredBoard(user.id, boardId);
     }
 
-    @Get("invite/:token")
-    joinBoardByLink(@GetUser() user: User, @Param('token') token: string): any {
-        return this.boardService.joinBoardByLink(user.id, token);
+    @Get("accept-invitation-link/:token")
+    acceptInvitationLink(@GetUser() user: User, @Param('token') token: string): any {
+        return this.boardService.acceptInvitationLink(user.id, token);
     }
 }

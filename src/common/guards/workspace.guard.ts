@@ -20,10 +20,10 @@ export class WorkspaceGuard implements CanActivate {
         else if (request.route.path.includes(':workspaceId')) {
             workspaceId = request.params.workspaceId;
         }
-        else if(Object.keys(request.body).includes('workspaceId')) {
+        else if (Object.keys(request.body).includes('workspaceId')) {
             workspaceId = request.body.workspaceId;
         }
-
+        
         const workspace = await this.prismaService.workspace.findUnique({
             where: { id: Number(workspaceId) }
         });
@@ -34,8 +34,27 @@ export class WorkspaceGuard implements CanActivate {
         // If ADMIN accesses the route, return true
         if (user.role === Role.ADMIN)
             return true;
-        if (!workspace.adminIds.includes(user.id)) {
-            throw new ForbiddenException("You are not the administrator of a workspace");
+
+        const workspaceMember = await this.prismaService.workspaceMember.findUnique({
+            where: {
+                userId_workspaceId: {
+                    userId: user.id,
+                    workspaceId: workspace.id
+                }
+            }
+        });
+        if (request.method === 'GET') {
+            if (workspaceMember) return true;
+            else
+                throw new ForbiddenException("The workspace is only accessed by its members");
+        } else if (request.method === 'DELETE' && request.route.path.includes('/leave-workspace')) {
+            if (workspaceMember) return true;
+            else
+                throw new ForbiddenException("You are not a member of the workspace");
+        } else {
+            if (!workspace.adminIds.includes(user.id)) {
+                throw new ForbiddenException("You are not the administrator of a workspace");
+            }
         }
 
         return true;

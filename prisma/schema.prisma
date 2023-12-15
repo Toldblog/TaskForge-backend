@@ -45,6 +45,7 @@ model User {
 model Workspace {
   id          Int     @id @unique @default(autoincrement())
   name        String
+  description String?
   inviteToken String?
 
   createdAt DateTime @default(now())

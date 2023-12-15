@@ -4,8 +4,9 @@ import { WorkspacesService } from './workspaces.service';
 import { GatewayModule } from 'src/gateway/gateway.module';
 import { AppGateway } from 'src/gateway/app.gateway';
 import { JwtModule } from '@nestjs/jwt';
+import { MailModule } from 'src/email/mail.module';
 @Module({
-  imports: [GatewayModule, JwtModule],
+  imports: [GatewayModule, JwtModule, MailModule],
   controllers: [WorkspacesController],
   providers: [WorkspacesService, AppGateway],
 })
