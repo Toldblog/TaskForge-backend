@@ -20,5 +20,16 @@ export class UtilService {
 
     return response;
   }
+
+  public swapTwoElementsInArray(array: any, firstElement: any, secondElement: any): any {
+    const firstIndex = array.indexOf(firstElement);
+    const secondIndex = array.indexOf(secondElement);
+
+    const tmp = array[firstIndex];
+    array[firstIndex] = array[secondIndex];
+    array[secondIndex] = tmp;
+
+    return array;
+  }
 }
 

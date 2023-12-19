@@ -61,15 +61,22 @@ export class BoardsService {
 
             // create default list
             const listNames = template.defaultList;
-            listNames.forEach(async (name, index) => {
-                await this.prismaService.list.create({
+            listNames.forEach(async (name) => {
+                const list = await this.prismaService.list.create({
                     data: {
                         name,
-                        positionInBoard: index + 1,
                         boardId: board.id
                     }
-                })
+                });
+                board.listsOrder.push(list.id)
             });
+            await this.prismaService.board.update({
+                where: {id: board.id},
+                data: {
+                    listsOrder: board.listsOrder
+                }
+            });
+            
             // create board member relation
             await this.prismaService.boardMember.create({
                 data: {

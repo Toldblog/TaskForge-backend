@@ -53,7 +53,7 @@ export class CRUDService {
     }
 
     if (!doc) {
-      throw new NotFoundException(`No document found with ID: ${id}`);
+      throw new NotFoundException(`${model} not found`);
     }
 
     return {
@@ -91,7 +91,7 @@ export class CRUDService {
     }
 
     if (!doc) {
-      throw new NotFoundException(`No document found with ID: ${id}`);
+      throw new NotFoundException(`${model} not found`);
     }
 
     return {
@@ -107,7 +107,7 @@ export class CRUDService {
     });
 
     if (!doc) {
-      throw new NotFoundException(`No document found with ID: ${id}`);
+      throw new NotFoundException(`${model} not found`);
     }
 
     return {

@@ -11,6 +11,27 @@ export class WorkspacesService {
         private readonly appGateway: AppGateway
     ) { }
 
+    async getMyWorkspaces(userId: number): Promise<any> {
+        try {
+            const workspaces = await this.prismaService.workspace.findMany({
+                where: {
+                    workspaceMembers: {
+                        some: {
+                            userId
+                        }
+                    }
+                },
+                include: { boards: true }
+            });
+
+            return {
+                Workspaces: workspaces.map(workspace => this.utilService.filterResponse(workspace))
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async acceptInvitationLink(userId: number, token: string): Promise<any> {
         try {
             const workspace = await this.prismaService.workspace.findFirst({

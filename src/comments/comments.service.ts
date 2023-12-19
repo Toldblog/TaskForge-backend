@@ -72,7 +72,7 @@ export class CommentsService {
             });
 
             return {
-                comment: this.utilService.filterResponse(comment)
+                Comment: comment
             };
         } catch (error) {
             throw error;

@@ -23,6 +23,7 @@ export class WorkspaceGuard implements CanActivate {
         else if (Object.keys(request.body).includes('workspaceId')) {
             workspaceId = request.body.workspaceId;
         }
+        if(!workspaceId) return true;
         
         const workspace = await this.prismaService.workspace.findUnique({
             where: { id: Number(workspaceId) }
