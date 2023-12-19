@@ -12,6 +12,7 @@ import { CommonModule } from './common/common.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CommentsModule } from './comments/comments.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CommentsModule } from './comments/comments.module';
     AuthModule,
     CardsModule,
     CommentsModule,
+    MessagesModule,
     BoardsModule,
     ListsModule,
     UsersModule,
@@ -27,9 +29,9 @@ import { CommentsModule } from './comments/comments.module';
     NotificationsModule,
     CommonModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    GatewayModule
+    GatewayModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

@@ -24,11 +24,11 @@ model User {
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   boardMembers         BoardMember[]
-  ownBoards            Board[]
+  boards               Board[]
   cardActivities       CardActivity[]
   cardAssignees        CardAssignee[]
   comments             Comment[]
-  messages             messages[]
+  messages             Message[]
   receiveNotifications Notification[]    @relation("receive_notification")
   sendNotifications    Notification[]    @relation("send_notification")
   workspaceMembers     WorkspaceMember[]
@@ -88,11 +88,11 @@ model Board {
   inviteToken   String?
   listsOrder    Int[]          @default([])
   boardMembers  BoardMember[]
-  creator       User           @relation(fields: [creatorId], references: [id])
+  users         User           @relation(fields: [creatorId], references: [id])
   template      Template       @relation(fields: [templateId], references: [id])
   workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   lists         List[]
-  messages      messages[]
+  messages             Message[]
   notifications Notification[]
 
   @@map("boards")
@@ -184,6 +184,18 @@ model Comment {
   @@map("comments")
 }
 
+model Message {
+  id        Int      @id @unique @default(autoincrement())
+  content   String
+  userId    Int
+  boardId   Int
+  createdAt DateTime  @default(now())
+  board     Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  sender    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
 model CardActivity {
   id        Int      @id @unique @default(autoincrement())
   activity  String
@@ -207,23 +219,13 @@ model Notification {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   boardId     Int?
-  board       Board?           @relation(fields: [boardId], references: [id])
+  boards      Board?           @relation(fields: [boardId], references: [id])
   card        Card?            @relation(fields: [cardId], references: [id])
   receiver    User             @relation("receive_notification", fields: [receiverId], references: [id])
   sender      User             @relation("send_notification", fields: [senderId], references: [id])
   workspace   Workspace?       @relation(fields: [workspaceId], references: [id])
 
   @@map("notifications")
-}
-
-model messages {
-  id        Int      @id @unique @default(autoincrement())
-  content   String
-  userId    Int
-  boardId   Int
-  createdAt DateTime @default(now())
-  boards    Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  users     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
