@@ -31,6 +31,11 @@ export class WorkspacesController {
         }
     }
 
+    @Get('my-workspaces')
+    getMyWorkspaces(@GetUser() user: User): any {
+        return this.workspaceService.getMyWorkspaces(user.id);
+    }
+
     @Get(':id')
     @UseGuards(WorkspaceGuard)
     async getWorkspace(@Param('id') id: string): Promise<any> {

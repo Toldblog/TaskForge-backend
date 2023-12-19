@@ -23,6 +23,7 @@ export class BoardGuard implements CanActivate {
         else if (Object.keys(request.body).includes('boardId')) {
             boardId = request.body.boardId;
         }
+        if(!boardId) return true;
 
         const board = await this.prismaService.board.findUnique({
             where: { id: Number(boardId) }
