@@ -7,15 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 model User {
-  id                   Int       @id @unique @default(autoincrement())
-  username             String    @unique
-  email                String    @unique
+  id                   Int               @id @unique @default(autoincrement())
+  username             String            @unique
+  email                String            @unique
   name                 String
   password             String?
   passwordConfirm      String?
@@ -23,48 +18,46 @@ model User {
   changePasswordAt     DateTime?
   passwordResetToken   String?
   passwordResetExpires DateTime?
-  active               Boolean   @default(false)
+  active               Boolean           @default(false)
   avatar               String?
-  role                 Role      @default(USER)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  workspaceMembers     WorkspaceMember[]
+  role                 Role              @default(USER)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
   boardMembers         BoardMember[]
-  comments             Comment[]
+  boards               Board[]
   cardActivities       CardActivity[]
-  sendNotifications    Notification[]    @relation("send_notification")
-  receiveNotifications Notification[]    @relation("receive_notification")
   cardAssignees        CardAssignee[]
+  comments             Comment[]
+  messages             Message[]
+  receiveNotifications Notification[]    @relation("receive_notification")
+  sendNotifications    Notification[]    @relation("send_notification")
+  workspaceMembers     WorkspaceMember[]
 
   @@map("users")
 }
 
 model Workspace {
-  id   Int    @id @unique @default(autoincrement())
-  name String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  ownerUserIds Int[]
-
-  workspaceMembers WorkspaceMember[]
+  id               Int               @id @unique @default(autoincrement())
+  name             String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  adminIds         Int[]
+  inviteToken      String?
+  description      String?
   boards           Board[]
   notifications    Notification[]
+  workspaceMembers WorkspaceMember[]
 
   @@map("workspaces")
 }
 
 model WorkspaceMember {
   userId      Int
-  user        User      @relation(fields: [userId], references: [id])
   workspaceId Int
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@id([userId, workspaceId])
   @@map("workspace_member")
@@ -74,107 +67,94 @@ model Template {
   id                Int      @id @unique @default(autoincrement())
   defaultList       String[] @default(["To do", "In progress", "Done"])
   defaultBackground String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  boards Board[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  boards            Board[]
 
   @@map("templates")
 }
 
 model Board {
-  id         Int     @id @unique @default(autoincrement())
-  name       String
-  background String
-  visibility Boolean @default(true) //True: visible in workspace, False: only member in board can see
-  closed     Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  workspaceId Int
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  templateId  Int
-  template    Template  @relation(fields: [templateId], references: [id])
-
-  boardMembers BoardMember[]
-  lists        List[]
+  id            Int            @id @unique @default(autoincrement())
+  name          String
+  background    String
+  visibility    Boolean        @default(true)
+  closed        Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  creatorId     Int
+  workspaceId   Int
+  templateId    Int
+  inviteToken   String?
+  listsOrder    Int[]          @default([])
+  boardMembers  BoardMember[]
+  users         User           @relation(fields: [creatorId], references: [id])
+  template      Template       @relation(fields: [templateId], references: [id])
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  lists         List[]
+  messages             Message[]
+  notifications Notification[]
 
   @@map("boards")
 }
 
 model BoardMember {
-  userId  Int
-  user    User  @relation(fields: [userId], references: [id])
-  boardId Int
-  board   Board @relation(fields: [boardId], references: [id])
-
-  starred          Boolean  @default(false)
-  viewRecentlyDate DateTime
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId           Int
+  boardId          Int
+  starred          Boolean   @default(false)
+  viewRecentlyDate DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  board            Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, boardId])
   @@map("board_member")
 }
 
 model List {
-  id              Int    @id @unique @default(autoincrement())
-  name            String
-  positionInBoard Int
-
-  boardId Int
-  board   Board @relation(fields: [boardId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  cards Card[]
+  id         Int      @id @unique @default(autoincrement())
+  name       String
+  boardId    Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  cardsOrder Int[]    @default([])
+  cards      Card[]
+  board      Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
   @@map("lists")
 }
 
 model Card {
-  id           Int       @id @unique @default(autoincrement())
-  title        String
-  description  String?
-  active       Boolean   @default(true)
-  dueDate      DateTime?
-  reminderDate DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  listId Int
-  list   List @relation(fields: [listId], references: [id])
-
-  cardAttachments CardAttachment[]
-  comments        Comment[]
+  id              Int              @id @unique @default(autoincrement())
+  title           String
+  description     String?
+  active          Boolean          @default(true)
+  dueDate         DateTime?
+  reminderDate    DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  listId          Int
   cardActivities  CardActivity[]
-  notifications   Notification[]
   cardAssignees   CardAssignee[]
+  cardAttachments CardAttachment[]
+  list            List             @relation(fields: [listId], references: [id], onDelete: Cascade)
+  comments        Comment[]
+  notifications   Notification[]
 
   @@map("cards")
 }
 
 model CardAssignee {
   assigneeId Int
-  assignee   User @relation(fields: [assigneeId], references: [id])
   cardId     Int
-  card       Card @relation(fields: [cardId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  assignee   User     @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
+  card       Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   @@id([assigneeId, cardId])
   @@map("card_assignee")
-}
-
-enum AttachmentType {
-  FILE
-  LINK
 }
 
 model CardAttachment {
@@ -183,44 +163,79 @@ model CardAttachment {
   fileName   String
   url        String
   type       AttachmentType @default(FILE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  cardId Int
-  card   Card @relation(fields: [cardId], references: [id])
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  cardId     Int
+  card       Card           @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   @@map("card_attachment")
 }
 
 model Comment {
-  id      Int    @id @unique @default(autoincrement())
-  content String
-
+  id        Int      @id @unique @default(autoincrement())
+  content   String
   userId    Int
-  commenter User @relation(fields: [userId], references: [id])
   cardId    Int
-  card      Card @relation(fields: [cardId], references: [id])
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  commenter User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }
 
+model Message {
+  id        Int      @id @unique @default(autoincrement())
+  content   String
+  userId    Int
+  boardId   Int
+  createdAt DateTime  @default(now())
+  board     Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  sender    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
 model CardActivity {
-  id       Int    @id @unique @default(autoincrement())
-  activity String
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-  cardId Int
-  card   Card @relation(fields: [cardId], references: [id])
-
+  id        Int      @id @unique @default(autoincrement())
+  activity  String
+  userId    Int
+  cardId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("card_activity")
+}
+
+model Notification {
+  id          Int              @id @unique @default(autoincrement())
+  type        NotificationType @default(ASSIGNMENT)
+  senderId    Int
+  receiverId  Int
+  workspaceId Int?
+  cardId      Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  boardId     Int?
+  boards      Board?           @relation(fields: [boardId], references: [id])
+  card        Card?            @relation(fields: [cardId], references: [id])
+  receiver    User             @relation("receive_notification", fields: [receiverId], references: [id])
+  sender      User             @relation("send_notification", fields: [senderId], references: [id])
+  workspace   Workspace?       @relation(fields: [workspaceId], references: [id])
+
+  @@map("notifications")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AttachmentType {
+  FILE
+  LINK
 }
 
 enum NotificationType {
@@ -228,23 +243,5 @@ enum NotificationType {
   REMOVE
   ASSIGNMENT
   COMMENT
-}
-
-model Notification {
-  id   Int              @id @unique @default(autoincrement())
-  type NotificationType @default(ASSIGNMENT)
-
-  senderId    Int
-  sender      User       @relation(name: "send_notification", fields: [senderId], references: [id])
-  receiverId  Int
-  receiver    User       @relation(name: "receive_notification", fields: [receiverId], references: [id])
-  workspaceId Int?
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
-  cardId      Int?
-  card        Card?      @relation(fields: [cardId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("notifications")
+  ADD_TO_BOARD
 }
