@@ -92,7 +92,7 @@ model Board {
   template      Template       @relation(fields: [templateId], references: [id])
   workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   lists         List[]
-  messages             Message[]
+  messages      Message[]
   notifications Notification[]
 
   @@map("boards")
@@ -158,15 +158,14 @@ model CardAssignee {
 }
 
 model CardAttachment {
-  id         Int            @id @unique @default(autoincrement())
-  uploadDate DateTime
-  fileName   String
-  url        String
-  type       AttachmentType @default(FILE)
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
-  cardId     Int
-  card       Card           @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  id        Int            @id @unique @default(autoincrement())
+  fileName  String
+  url       String
+  type      AttachmentType @default(FILE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  cardId    Int
+  card      Card           @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   @@map("card_attachment")
 }
@@ -189,9 +188,9 @@ model Message {
   content   String
   userId    Int
   boardId   Int
-  createdAt DateTime  @default(now())
-  board     Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  sender    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }
