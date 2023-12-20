@@ -38,7 +38,7 @@ export class WorkspaceGuard implements CanActivate {
 
         const workspaceMember = await this.prismaService.workspaceMember.findUnique({
             where: {
-                userId_workspaceId: {
+                id: {
                     userId: user.id,
                     workspaceId: workspace.id
                 }
@@ -53,6 +53,9 @@ export class WorkspaceGuard implements CanActivate {
             else
                 throw new ForbiddenException("You are not a member of the workspace");
         } else {
+            if(!workspaceMember) {
+                throw new ForbiddenException("You are not a member of the workspace");
+            }
             if (!workspace.adminIds.includes(user.id)) {
                 throw new ForbiddenException("You are not the administrator of a workspace");
             }

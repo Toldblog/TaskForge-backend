@@ -54,24 +54,13 @@ export class UsersService {
     }
   }
 
-  async deleteMe(userId: number): Promise<any> {
-    try {
-      await this.prismaService.user.update({
-        where: { id: userId },
-        data: { active: false },
-      });
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async uploadAvatar(
     userId: number,
     file: Express.Multer.File,
   ): Promise<{ user: any }> {
     try {
       // create random file name
-      const fileName = `avatar-${userId}-${Date.now()}`;
+      const fileName = `avatar-${userId}-${Date.now()}.${file.originalname.split('.').pop() }`;
 
       // upload file
       const { error: storageError } = await this.supabase.storage
@@ -86,9 +75,7 @@ export class UsersService {
       const updatedUser = await this.prismaService.user.update({
         where: { id: userId },
         data: {
-          avatar: `${this.configService.get(
-            'SUPABASE_URL',
-          )}/storage/v1/object/public/avatars/${fileName}`,
+          avatar: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/avatars/${fileName}`,
         },
       });
       const userRes = this.utilService.filterUserResponse(updatedUser);

@@ -23,7 +23,7 @@ export class BoardGuard implements CanActivate {
         else if (Object.keys(request.body).includes('boardId')) {
             boardId = request.body.boardId;
         }
-        if(!boardId) return true;
+        if (!boardId) return true;
 
         const board = await this.prismaService.board.findUnique({
             where: { id: Number(boardId) }
@@ -41,7 +41,7 @@ export class BoardGuard implements CanActivate {
 
         const boardMember = await this.prismaService.boardMember.findUnique({
             where: {
-                userId_boardId: {
+                id: {
                     userId: user.id,
                     boardId: Number(boardId)
                 }
@@ -54,12 +54,13 @@ export class BoardGuard implements CanActivate {
             if (boardMember) return true;
             else
                 throw new ForbiddenException("The board is only accessed by its members");
-        } else if ((request.method === "DELETE" && request.route.path.includes('/leave-board')) ||
-            (request.method === "PATCH" && request.route.path.includes('/starred-board'))
+        } else if (
+            (request.method === "PATCH" && request.route.path.includes("/boards/:id")) ||
+            (request.method === "DELETE" && request.route.path.includes("/boards/:id"))
         ) {
-            if (boardMember) return true;
-            else
-                throw new BadRequestException("You are not a member of this board");
+            if (board.creatorId !== user.id) {
+                throw new ForbiddenException("You are not the creator of this board");
+            }
         } else if (request.method === "POST" && request.route.path.includes('/join-board')) {
             if (boardMember)
                 throw new BadRequestException("You are already a member of this board");
@@ -67,9 +68,9 @@ export class BoardGuard implements CanActivate {
                 throw new ForbiddenException("This board is private");
             }
         } else {
-            if (board.creatorId !== user.id) {
-                throw new ForbiddenException("You are not the creator of this board");
-            }
+            if (boardMember) return true;
+            else
+                throw new BadRequestException("You are not a member of this board");
         }
 
         return true;

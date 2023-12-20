@@ -21,7 +21,48 @@ export class BoardsController {
     @Roles(Role.ADMIN)
     async getAllBoards(@Query() options: any): Promise<any> {
         try {
-            const result = await this.crudService.getAll('Board', options);
+            const result = await this.crudService.getAll('board', options);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    @Get('joined-boards')
+    async getAllJoinBoards(@GetUser() user: User): Promise<any> {
+        try {
+            const result = await this.crudService.getAll('boardMember', {
+                userId: user.id
+            }, {
+                board: {
+                    include: { lists: true }
+                }
+            });
+
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    @Get('joined-boards/:workspaceId')
+    @UseGuards(WorkspaceGuard)
+    async getAllJoinBoardsInWorkspace(
+        @GetUser() user: User, 
+        @Param('workspaceId', ParseIntPipe) workspaceId: number
+    ): Promise<any> {
+        try {
+            const result = await this.crudService.getAll('boardMember', {
+                userId: user.id,
+                board: {
+                    workspaceId
+                }
+            }, {
+                board: {
+                    include: { lists: true }
+                }
+            });
+
             return result;
         } catch (error) {
             throw error;
@@ -30,8 +71,21 @@ export class BoardsController {
 
     @Get(':id')
     @UseGuards(BoardGuard)
-    getBoard(@Param('id', ParseIntPipe) id: number): any {
-        return this.boardService.getBoard(id);
+    async getBoard(@Param('id', ParseIntPipe) id: number): Promise<any> {
+        try {
+            const result = await this.crudService.getOne('board', id, {
+                lists: {
+                    include: {
+                        cards: true
+                    }
+                },
+                boardMembers: true
+            });
+
+            return result;
+        } catch (error) {
+            throw error;
+        }
     }
 
     @Post()
@@ -42,9 +96,9 @@ export class BoardsController {
 
     @Patch(':id')
     @UseGuards(BoardGuard)
-    async updateBoard(@Param('id') id: string, @Body() body: UpdateBoardDto): Promise<any> {
+    async updateBoard(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateBoardDto): Promise<any> {
         try {
-            const result = await this.crudService.updateOne('Board', id, body, {
+            const result = await this.crudService.updateOne('board', id, body, {
                 lists: {
                     include: {
                         cards: true
@@ -59,9 +113,9 @@ export class BoardsController {
 
     @Delete(":id")
     @UseGuards(BoardGuard)
-    async deleteBoard(@Param('id') id: string): Promise<any> {
+    async deleteBoard(@Param('id', ParseIntPipe) id: number): Promise<any> {
         try {
-            const result = await this.crudService.deleteOne('Board', id);
+            const result = await this.crudService.deleteOne('board', id);
             return result;
         } catch (error) {
             throw error;
@@ -70,8 +124,24 @@ export class BoardsController {
 
     @Post("join-board/:id")
     @UseGuards(BoardGuard)
-    joinBoard(@GetUser() user: User, @Param('id', ParseIntPipe) boardId: number): any {
-        return this.boardService.joinBoard(user.id, boardId);
+    async joinBoard(@GetUser() user: User, @Param('id', ParseIntPipe) boardId: number): Promise<any> {
+        try {
+            await this.crudService.createOne('boardMember', {
+                userId: user.id,
+                boardId
+            });
+            const result = await this.crudService.getOne('board', boardId, {
+                lists: {
+                    include: {
+                        cards: true
+                    }
+                },
+                boardMembers: true
+            });
+            return result;
+        } catch (error) {
+            throw error;
+        }
     }
 
     @Post("share-board")
@@ -82,14 +152,33 @@ export class BoardsController {
 
     @Delete("leave-board/:id")
     @UseGuards(BoardGuard)
-    leaveBoard(@GetUser() user: User, @Param('id', ParseIntPipe) boardId: number): any {
-        return this.boardService.leaveBoard(user.id, boardId);
+    async leaveBoard(@GetUser() user: User, @Param('id', ParseIntPipe) boardId: number): Promise<any> {
+        try {
+            const result = await this.crudService.deleteOne('boardMember', {
+                userId: user.id,
+                boardId
+            });
+
+            return result;
+        } catch (error) {
+            throw error;
+        }
     }
 
     @Patch("starred-board/:id")
     @UseGuards(BoardGuard)
-    starredBoard(@GetUser() user: User, @Param('id', ParseIntPipe) boardId: number): any {
-        return this.boardService.starredBoard(user.id, boardId);
+    async starredBoard(@GetUser() user: User, @Param('id', ParseIntPipe) boardId: number): Promise<any> {
+        try {
+            const { boardMember } = await this.crudService.getOne('boardMember', { userId: user.id, boardId })
+            await this.crudService.updateOne('boardMember', { userId: user.id, boardId },
+                {
+                    starred: !boardMember?.starred
+                }
+            );
+            return null;
+        } catch (error) {
+            throw error;
+        }
     }
 
     @Get("accept-invitation-link/:token")
