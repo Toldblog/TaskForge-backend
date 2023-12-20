@@ -13,28 +13,6 @@ export class BoardsService {
         private readonly appGateway: AppGateway
     ) { }
 
-    async getBoard(id: number): Promise<any> {
-        try {
-            const board = await this.prismaService.board.findUnique({
-                where: { id },
-                include: {
-                    lists: {
-                        include: {
-                            cards: true
-                        }
-                    },
-                    boardMembers: true
-                }
-            });
-
-            return {
-                Board: this.utilService.filterResponse(board)
-            }
-        } catch (error) {
-            throw error;
-        }
-    }
-
     async createBoard(userId: number, body: CreateBoardDto): Promise<any> {
         try {
             const template = await this.prismaService.template.findUnique({
@@ -61,22 +39,24 @@ export class BoardsService {
 
             // create default list
             const listNames = template.defaultList;
-            listNames.forEach(async (name) => {
+            const listsLen = listNames.length;
+            for(let i = 0; i < listsLen; i++) {
                 const list = await this.prismaService.list.create({
                     data: {
-                        name,
+                        name: listNames[i],
                         boardId: board.id
                     }
                 });
                 board.listsOrder.push(list.id)
-            });
+            }
+
             await this.prismaService.board.update({
-                where: {id: board.id},
+                where: { id: board.id },
                 data: {
                     listsOrder: board.listsOrder
                 }
             });
-            
+
             // create board member relation
             await this.prismaService.boardMember.create({
                 data: {
@@ -86,40 +66,8 @@ export class BoardsService {
             });
 
             return {
-                Board: this.utilService.filterResponse(board)
+                board: this.utilService.filterResponse(board)
             };
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async joinBoard(userId: number, boardId: number): Promise<any> {
-        try {
-            await this.prismaService.boardMember.create({
-                data: {
-                    userId,
-                    boardId
-                }
-            });
-
-            return null;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async leaveBoard(userId: number, boardId: number): Promise<any> {
-        try {
-            await this.prismaService.boardMember.delete({
-                where: {
-                    userId_boardId: {
-                        userId,
-                        boardId
-                    }
-                }
-            });
-
-            return null;
         } catch (error) {
             throw error;
         }
@@ -169,27 +117,21 @@ export class BoardsService {
                 boardId: board.id
             });
 
-            const result = await this.getBoard(body.boardId);
-            return result;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async starredBoard(userId: number, boardId: number): Promise<any> {
-        try {
-            await this.prismaService.boardMember.update({
-                where: {
-                    userId_boardId: {
-                        userId, boardId
-                    }
-                },
-                data: {
-                    starred: true
+            const result = await this.prismaService.board.findUnique({
+                where: { id: body.boardId },
+                include: {
+                    lists: {
+                        include: {
+                            cards: true
+                        }
+                    },
+                    boardMembers: true
                 }
             });
 
-            return null;
+            return {
+                board: this.utilService.filterResponse(result)
+            };
         } catch (error) {
             throw error;
         }
@@ -224,7 +166,7 @@ export class BoardsService {
 
             // add new record to the BoardMember model
             await this.prismaService.boardMember.upsert({
-                where: { userId_boardId: { userId, boardId: board.id } },
+                where: { id: { userId, boardId: board.id } },
                 create: {
                     userId,
                     boardId: board.id
@@ -233,7 +175,7 @@ export class BoardsService {
             });
 
             return {
-                Board: this.utilService.filterResponse(board)
+                board: this.utilService.filterResponse(board)
             }
         } catch (error) {
             throw error;

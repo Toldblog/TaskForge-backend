@@ -61,7 +61,7 @@ export class CardGuard implements CanActivate {
         }
         const boardMember = await this.prismaService.boardMember.findUnique({
             where: {
-                userId_boardId: {
+                id: {
                     userId: user.id,
                     boardId: board.id
                 }

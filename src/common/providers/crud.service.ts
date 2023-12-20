@@ -11,7 +11,7 @@ export class CRUDService {
     private utilService: UtilService,
   ) { }
 
-  async getAll(model: string, options: any): Promise<any> {
+  async getAll(model: string, options: any, include: object = null): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
     let doc = null;
 
@@ -21,15 +21,27 @@ export class CRUDService {
       const selectedFields = this.apiService.getSelectedFields(options);
       const { skip, take } = this.apiService.getPagination(options);
 
-      doc = await this.prismaService[prismaModel].findMany({
-        where: filter,
-        orderBy: sortBy,
-        select: selectedFields,
-        skip,
-        take
-      });
+      if (!include) {
+        doc = await this.prismaService[prismaModel].findMany({
+          where: filter,
+          orderBy: sortBy,
+          select: selectedFields,
+          skip,
+          take,
+        });
+      } else {
+        doc = await this.prismaService[prismaModel].findMany({
+          where: filter,
+          orderBy: sortBy,
+          skip,
+          take,
+          include
+        });
+      }
     } else {
-      doc = await this.prismaService[prismaModel].findMany({});
+      doc = await this.prismaService[prismaModel].findMany({
+        include
+      });
     }
 
     return {
@@ -38,22 +50,22 @@ export class CRUDService {
     };
   }
 
-  async getOne(model: string, id: string, include: object = null): Promise<any> {
+  async getOne(model: string, id: any, include: object = null): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
     let doc = null;
     if (include) {
       doc = await this.prismaService[prismaModel].findUnique({
-        where: { id: Number(id) },
+        where: { id },
         include: include
       });
     } else {
       doc = await this.prismaService[prismaModel].findUnique({
-        where: { id: Number(id) }
+        where: { id }
       });
     }
 
     if (!doc) {
-      throw new NotFoundException(`${model} not found`);
+      throw new NotFoundException(`${model.toUpperCase()} not found`);
     }
 
     return {
@@ -73,25 +85,25 @@ export class CRUDService {
     };
   }
 
-  async updateOne(model: string, id: string, body: any, include: object = null): Promise<any> {
+  async updateOne(model: string, id: any, body: any, include: object = null): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
     let doc = null;
 
-    if(include) {
+    if (include) {
       doc = await this.prismaService[prismaModel].update({
-        where: { id: Number(id) },
+        where: { id },
         data: body,
         include: include
       });
     } else {
       doc = await this.prismaService[prismaModel].update({
-        where: { id: Number(id) },
+        where: { id },
         data: body,
       });
     }
 
     if (!doc) {
-      throw new NotFoundException(`${model} not found`);
+      throw new NotFoundException(`${model.toUpperCase()} not found`);
     }
 
     return {
@@ -99,19 +111,17 @@ export class CRUDService {
     };
   }
 
-  async deleteOne(model: string, id: string): Promise<any> {
+  async deleteOne(model: string, id: any): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
 
     const doc = await this.prismaService[prismaModel].delete({
-      where: { id: Number(id) },
+      where: { id },
     });
 
     if (!doc) {
-      throw new NotFoundException(`${model} not found`);
+      throw new NotFoundException(`${model.toUpperCase()} not found`);
     }
 
-    return {
-      data: null,
-    };
+    return null;
   }
 }
