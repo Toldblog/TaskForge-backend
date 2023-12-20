@@ -11,27 +11,6 @@ export class WorkspacesService {
         private readonly appGateway: AppGateway
     ) { }
 
-    async getMyWorkspaces(userId: number): Promise<any> {
-        try {
-            const workspaces = await this.prismaService.workspace.findMany({
-                where: {
-                    workspaceMembers: {
-                        some: {
-                            userId
-                        }
-                    }
-                },
-                include: { boards: true }
-            });
-
-            return {
-                Workspaces: workspaces.map(workspace => this.utilService.filterResponse(workspace))
-            }
-        } catch (error) {
-            throw error;
-        }
-    }
-
     async acceptInvitationLink(userId: number, token: string): Promise<any> {
         try {
             const workspace = await this.prismaService.workspace.findFirst({
@@ -44,7 +23,7 @@ export class WorkspacesService {
 
             // add new record to the BoardMember model if not exists
             await this.prismaService.workspaceMember.upsert({
-                where: { userId_workspaceId: { userId, workspaceId: workspace.id } },
+                where: { id: { userId, workspaceId: workspace.id } },
                 create: {
                     userId,
                     workspaceId: workspace.id
@@ -53,7 +32,7 @@ export class WorkspacesService {
             });
 
             return {
-                Workspace: this.utilService.filterResponse(workspace)
+                workspace: this.utilService.filterResponse(workspace)
             }
         } catch (error) {
             throw error;
@@ -80,7 +59,7 @@ export class WorkspacesService {
 
             await this.prismaService.workspaceMember.delete({
                 where: {
-                    userId_workspaceId: {
+                    id: {
                         userId, workspaceId
                     }
                 }
@@ -104,7 +83,7 @@ export class WorkspacesService {
             // remove the user out of workspace
             await this.prismaService.workspaceMember.delete({
                 where: {
-                    userId_workspaceId: {
+                    id: {
                         userId,
                         workspaceId
                     }
@@ -154,7 +133,7 @@ export class WorkspacesService {
             // check the user is already a member of the workspace
             const workspaceMember = await this.prismaService.workspaceMember.findUnique({
                 where: {
-                    userId_workspaceId: {
+                    id: {
                         userId,
                         workspaceId
                     }
@@ -223,7 +202,7 @@ export class WorkspacesService {
             users = users.map(user => this.utilService.filterUserResponse(user));
 
             return {
-                Users: users
+                users: users
             }
         } catch (error) {
             throw error;

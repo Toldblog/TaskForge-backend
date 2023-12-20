@@ -7,7 +7,7 @@ import {
 export class UpdateBoardDto {
     @IsOptional()
     @IsString()
-    @MaxLength(20)
+    @MaxLength(50)
     name: string;
 
     @IsOptional()

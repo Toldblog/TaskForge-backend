@@ -24,7 +24,9 @@ export class WorkspacesController {
     @Roles(Role.ADMIN)
     async getAllWorkspaces(@Query() options: any): Promise<any> {
         try {
-            const result = await this.crudService.getAll('Workspace', options);
+            const result = await this.crudService.getAll('workspace', options, {
+                boards: true
+            });
             return result;
         } catch (error) {
             throw error;
@@ -32,15 +34,27 @@ export class WorkspacesController {
     }
 
     @Get('my-workspaces')
-    getMyWorkspaces(@GetUser() user: User): any {
-        return this.workspaceService.getMyWorkspaces(user.id);
+    async getMyWorkspaces(@GetUser() user: User): Promise<any> {
+        try {
+            const result = await this.crudService.getAll('workspace', {
+                workspaceMembers: {
+                    some: {
+                        userId: user.id
+                    }
+                }
+            }, { boards: true });
+
+            return result;
+        } catch (error) {
+            throw error;
+        }
     }
 
     @Get(':id')
     @UseGuards(WorkspaceGuard)
-    async getWorkspace(@Param('id') id: string): Promise<any> {
+    async getWorkspace(@Param('id', ParseIntPipe) id: number): Promise<any> {
         try {
-            const result = await this.crudService.getOne('Workspace', id, {
+            const result = await this.crudService.getOne('workspace', id, {
                 boards: true
             });
             return result;
@@ -58,7 +72,7 @@ export class WorkspacesController {
     @Post()
     async createWorkspace(@GetUser() user: User, @Body() body: CreateWorkspaceDto): Promise<any> {
         try {
-            const { Workspace: workspace } = await this.crudService.createOne('Workspace', {
+            const { workspace } = await this.crudService.createOne('workspace', {
                 ...body,
                 adminIds: [user.id]
             });
@@ -66,9 +80,9 @@ export class WorkspacesController {
             const hash = crypto.createHash('sha256');
             const inviteToken = hash.update(String(workspace.id)).digest('hex');
 
-            const result = await this.crudService.updateOne("Workspace", String(workspace.id), { inviteToken });
+            const result = await this.crudService.updateOne("workspace", workspace.id, { inviteToken });
             // create new workspace member row
-            await this.crudService.createOne("WorkspaceMember", {
+            await this.crudService.createOne("workspaceMember", {
                 userId: user.id,
                 workspaceId: workspace.id
             });
@@ -81,9 +95,9 @@ export class WorkspacesController {
 
     @Patch(':id')
     @UseGuards(WorkspaceGuard)
-    async updateWorkspace(@Param('id') id: string, @Body() body: UpdateWorkspaceDto): Promise<any> {
+    async updateWorkspace(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateWorkspaceDto): Promise<any> {
         try {
-            const result = await this.crudService.updateOne("Workspace", id, body, {
+            const result = await this.crudService.updateOne("workspace", id, body, {
                 boards: true
             });
             return result;
@@ -94,9 +108,9 @@ export class WorkspacesController {
 
     @Delete(':id')
     @UseGuards(WorkspaceGuard)
-    async deleteWorkspace(@Param('id') id: string): Promise<any> {
+    async deleteWorkspace(@Param('id', ParseIntPipe) id: number): Promise<any> {
         try {
-            const result = await this.crudService.deleteOne("Workspace", id);
+            const result = await this.crudService.deleteOne("workspace", id);
             return result;
         } catch (error) {
             throw error;
@@ -111,13 +125,13 @@ export class WorkspacesController {
         @Param('userId', ParseIntPipe) userId: number
     ): Promise<any> {
         try {
-            await this.crudService.createOne('WorkspaceMember', {
+            await this.crudService.createOne('workspaceMember', {
                 workspaceId, userId
             });
 
             // send workspace invitation mail
-            const { User: user } = await this.crudService.getOne('User', String(userId));
-            const { Workspace: workspace } = await this.crudService.getOne('Workspace', String(workspaceId));
+            const { user } = await this.crudService.getOne('user', userId);
+            const { workspace } = await this.crudService.getOne('workspace', workspaceId);
 
             await this.mailService.sendWorkspaceInvitation(user.email, sender.name, workspace);
 

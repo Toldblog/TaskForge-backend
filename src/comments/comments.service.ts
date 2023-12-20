@@ -72,7 +72,7 @@ export class CommentsService {
             });
 
             return {
-                Comment: comment
+                comment: comment
             };
         } catch (error) {
             throw error;

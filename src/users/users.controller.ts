@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -30,7 +31,7 @@ export class UsersController {
     private crudService: CRUDService,
     private usersService: UsersService,
     private utilService: UtilService,
-  ) {}
+  ) { }
 
   // ME
 
@@ -49,7 +50,15 @@ export class UsersController {
 
   @Delete('me') // Delete a user by ID using prismaService.user
   async deleteMe(@GetUser() user: User): Promise<any> {
-    return this.usersService.deleteMe(user.id);
+    try {
+      await this.crudService.updateOne('user', user.id, {
+        active: false
+      });
+
+      return null;
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Post('upload-avatar')
@@ -65,19 +74,21 @@ export class UsersController {
   @Roles(Role.ADMIN)
   @Get() async getAllUsers(@Query() options: any): Promise<any> {
     try {
-      const result = await this.crudService.getAll('User', options);
-      return result;
+      const result = await this.crudService.getAll('user', options);
+      return {
+        users: result['users'].map(user => this.utilService.filterUserResponse(user)) 
+      }
     } catch (error) {
       throw error;
     }
   }
 
   @Get(':id')
-  async getUserById(@Param('id') id: string): Promise<any> {
+  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<any> {
     try {
-      const result = await this.crudService.getOne('User', id);
+      const result = await this.crudService.getOne('user', id);
       return {
-        User: this.utilService.filterUserResponse(result['User'])
+        user: this.utilService.filterUserResponse(result['user'])
       }
     } catch (error) {
       throw error;
@@ -86,10 +97,12 @@ export class UsersController {
 
   @Roles(Role.ADMIN)
   @Patch(':id')
-  async updateUser(@Param('id') id: string, @Body() body: any): Promise<any> {
+  async updateUser(@Param('id', ParseIntPipe) id: number, @Body() body: any): Promise<any> {
     try {
-      const result = await this.crudService.updateOne('User', id, body);
-      return result;
+      const result = await this.crudService.updateOne('user', id, body);
+      return {
+        user: this.utilService.filterUserResponse(result['user'])
+      }
     } catch (error) {
       throw error;
     }
@@ -97,9 +110,9 @@ export class UsersController {
 
   @Roles(Role.ADMIN)
   @Delete(':id')
-  async deleteUser(@Param('id') id: string): Promise<any> {
+  async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<any> {
     try {
-      const result = await this.crudService.deleteOne('User', id);
+      const result = await this.crudService.deleteOne('user', id);
       return result;
     } catch (error) {
       throw error;
