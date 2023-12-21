@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UtilService } from 'src/common/providers';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBoardDto, ShareBoardDto } from './dtos';
@@ -40,7 +40,7 @@ export class BoardsService {
             // create default list
             const listNames = template.defaultList;
             const listsLen = listNames.length;
-            for(let i = 0; i < listsLen; i++) {
+            for (let i = 0; i < listsLen; i++) {
                 const list = await this.prismaService.list.create({
                     data: {
                         name: listNames[i],
@@ -75,22 +75,13 @@ export class BoardsService {
 
     async shareBoard(adderId: number, adderName: string, body: ShareBoardDto): Promise<any> {
         try {
-            const workspaceMember = await this.prismaService.workspaceMember.findFirst({
+            const boardMember = await this.prismaService.boardMember.findUnique({
                 where: {
-                    user: {
-                        id: body.userId
-                    },
-                    workspace: {
-                        boards: {
-                            some: {
-                                id: body.boardId
-                            }
-                        }
-                    }
+                    id: body
                 }
             });
-            if (!workspaceMember) {
-                throw new NotFoundException('The user should be a member of the workspace');
+            if (boardMember) {
+                throw new BadRequestException('The user is already a member of the board');
             }
 
             // add new member to board
@@ -144,24 +135,6 @@ export class BoardsService {
             });
             if (!board) {
                 throw new NotFoundException("Board is not found");
-            }
-
-            const workspaceMember = await this.prismaService.workspaceMember.findFirst({
-                where: {
-                    user: {
-                        id: userId
-                    },
-                    workspace: {
-                        boards: {
-                            some: {
-                                id: board.id
-                            }
-                        }
-                    }
-                }
-            });
-            if (!workspaceMember) {
-                throw new NotFoundException('You should be a member of the workspace');
             }
 
             // add new record to the BoardMember model

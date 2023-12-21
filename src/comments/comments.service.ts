@@ -11,6 +11,63 @@ export class CommentsService {
         private readonly appGateway: AppGateway
     ) { }
 
+    async deleteComment(userId: number, commentId: number): Promise<any> {
+        try {
+            // check comment
+            const comment = await this.prismaService.comment.findUnique({
+                where: { id: commentId }
+            });
+            if (!comment) {
+                throw new NotFoundException("Comment not found");
+            }
+            // check comment's editing permission
+            if (comment.userId !== userId) {
+                throw new ForbiddenException("You are not allowed to edit this comment");
+            }
+
+            // delete comment
+            await this.prismaService.comment.delete({
+                where: { id: commentId }
+            });
+
+            return null;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async editComment(userId: number, commentId: number, content: string): Promise<any> {
+        try {
+            // check comment
+            const comment = await this.prismaService.comment.findUnique({
+                where: { id: commentId }
+            });
+            if (!comment) {
+                throw new NotFoundException("Comment not found");
+            }
+            // check comment's editing permission
+            if (comment.userId !== userId) {
+                throw new ForbiddenException("You are not allowed to edit this comment");
+            }
+
+            // update comment
+            const updatedComment = await this.prismaService.comment.update({
+                where: { id: commentId },
+                data: { content },
+                include: { commenter: true }
+            });
+
+            return {
+                comment: {
+                    ...updatedComment,
+                    commenter: this.utilService.filterUserResponse(updatedComment.commenter)
+                }
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async commentOnCard(userId: number, userName: string, cardId: number, content: string): Promise<any> {
         try {
             // Check card

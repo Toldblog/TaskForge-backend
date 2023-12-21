@@ -86,7 +86,7 @@ export class CardsService {
         },
         include: { cards: true }
       });
-
+      
       return {
         results: lists.length,
         lists: lists.map(list => this.utilService.filterResponse(list))
