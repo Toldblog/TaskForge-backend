@@ -1,4 +1,4 @@
-import { IsArray, IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 import { TemplateType } from "./template-type.enum";
 
 export class UpdateTemplateDto {
@@ -15,8 +15,8 @@ export class UpdateTemplateDto {
     type: TemplateType;
 
     @IsOptional()
-    @IsArray()
-    defaultList: string[];
+    @IsString()
+    defaultList: any;
 
     @IsOptional()
     defaultBackground: any;

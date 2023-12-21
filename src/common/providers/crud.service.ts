@@ -113,13 +113,16 @@ export class CRUDService {
   async deleteOne(model: string, id: any): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
 
-    const doc = await this.prismaService[prismaModel].delete({
+    const doc = await this.prismaService[prismaModel].findUnique({
       where: { id },
     });
-
     if (!doc) {
       throw new NotFoundException(`${model[0].toUpperCase()}${model.slice(1)} not found`);
     }
+
+    await this.prismaService[prismaModel].delete({
+      where: { id },
+    });
 
     return null;
   }

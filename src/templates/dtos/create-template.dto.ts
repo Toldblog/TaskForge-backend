@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { TemplateType } from "./template-type.enum";
 
 export class CreateTemplateDto {
@@ -15,9 +15,8 @@ export class CreateTemplateDto {
     type: TemplateType;
 
     @IsOptional()
-    @IsArray()
-    defaultList: string[];
+    @IsString()
+    defaultList: string;
 
-    @IsNotEmpty()
     defaultBackground: any;
 }

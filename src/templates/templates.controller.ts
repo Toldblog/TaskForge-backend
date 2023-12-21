@@ -63,13 +63,7 @@ export class TemplatesController {
   updateTemplate(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateTemplateDto,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new FileTypeValidator({ fileType: 'image/*' }),
-        ],
-      })
-    ) background: Express.Multer.File,
+    @UploadedFile() background: Express.Multer.File,
   ): any {
     return this.templatesService.updateTemplate(id, body, background);
   }

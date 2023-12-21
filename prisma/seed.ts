@@ -23,5 +23,5 @@ main()
         process.exit(1)
     })
 
-// yarn prisma db seed
-// yarn reset-init-schema
+// yarn prisma db seed => insert data to models
+// yarn reset-init-schema => reset schema, then insert data to models

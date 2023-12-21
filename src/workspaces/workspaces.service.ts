@@ -9,11 +9,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class WorkspacesService {
-    constructor(
-        private readonly prismaService: PrismaService,
-        private readonly utilService: UtilService,
-        private readonly appGateway: AppGateway
-    ) { }
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly utilService: UtilService,
+    private readonly appGateway: AppGateway
+  ) { }
 
   async acceptInvitationLink(userId: number, token: string): Promise<any> {
     try {
@@ -25,23 +25,23 @@ export class WorkspacesService {
         throw new NotFoundException('Workspace not found');
       }
 
-            // add new record to the BoardMember model if not exists
-            await this.prismaService.workspaceMember.upsert({
-                where: { id: { userId, workspaceId: workspace.id } },
-                create: {
-                    userId,
-                    workspaceId: workspace.id
-                },
-                update: {}
-            });
+      // add new record to the BoardMember model if not exists
+      await this.prismaService.workspaceMember.upsert({
+        where: { id: { userId, workspaceId: workspace.id } },
+        create: {
+          userId,
+          workspaceId: workspace.id
+        },
+        update: {}
+      });
 
-            return {
-                workspace: this.utilService.filterResponse(workspace)
-            }
-        } catch (error) {
-            throw error;
-        }
+      return {
+        workspace: this.utilService.filterResponse(workspace)
+      }
+    } catch (error) {
+      throw error;
     }
+  }
 
   async leaveWorkspace(userId: number, workspaceId: number): Promise<any> {
     try {
@@ -68,13 +68,13 @@ export class WorkspacesService {
         );
       }
 
-            await this.prismaService.workspaceMember.delete({
-                where: {
-                    id: {
-                        userId, workspaceId
-                    }
-                }
-            });
+      await this.prismaService.workspaceMember.delete({
+        where: {
+          id: {
+            userId, workspaceId
+          }
+        }
+      });
 
       return null;
     } catch (error) {
@@ -93,23 +93,23 @@ export class WorkspacesService {
         where: { id: workspaceId },
       });
 
-            // remove the user out of workspace
-            await this.prismaService.workspaceMember.delete({
-                where: {
-                    id: {
-                        userId,
-                        workspaceId
-                    }
-                }
-            });
-            if (workspace.adminIds.includes(userId)) {
-                await this.prismaService.workspace.update({
-                    where: { id: workspaceId },
-                    data: {
-                        adminIds: workspace.adminIds.filter(id => id !== userId)
-                    }
-                });
-            }
+      // remove the user out of workspace
+      await this.prismaService.workspaceMember.delete({
+        where: {
+          id: {
+            userId,
+            workspaceId
+          }
+        }
+      });
+      if (workspace.adminIds.includes(userId)) {
+        await this.prismaService.workspace.update({
+          where: { id: workspaceId },
+          data: {
+            adminIds: workspace.adminIds.filter(id => id !== userId)
+          }
+        });
+      }
 
       // add new notification
       await this.prismaService.notification.create({
@@ -147,18 +147,18 @@ export class WorkspacesService {
         );
       }
 
-            // check the user is already a member of the workspace
-            const workspaceMember = await this.prismaService.workspaceMember.findUnique({
-                where: {
-                    id: {
-                        userId,
-                        workspaceId
-                    }
-                }
-            });
-            if (!workspaceMember) {
-                throw new BadRequestException('The user is not a member of the workspace')
-            }
+      // check the user is already a member of the workspace
+      const workspaceMember = await this.prismaService.workspaceMember.findUnique({
+        where: {
+          id: {
+            userId,
+            workspaceId
+          }
+        }
+      });
+      if (!workspaceMember) {
+        throw new BadRequestException('The user is not a member of the workspace')
+      }
 
       // update workspace admins
       const updatedWorkspace = await this.prismaService.workspace.update({
@@ -218,11 +218,12 @@ export class WorkspacesService {
       });
       users = users.map((user) => this.utilService.filterUserResponse(user));
 
-            return {
-                users: users
-            }
-        } catch (error) {
-            throw error;
-        }
+      return {
+        results: users.length,
+        users: users
+      }
+    } catch (error) {
+      throw error;
     }
+  }
 }

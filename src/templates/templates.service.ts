@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTemplateDto, UpdateTemplateDto } from './dtos';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UtilService } from 'src/common/providers';
@@ -45,7 +45,7 @@ export class TemplatesService {
       const fileName = `template-${Date.now()}`;
       // upload file
       const { error: storageError } = await this.supabase.storage
-        .from('avatars') // Bucket name
+        .from('templates') // Bucket name
         .upload(fileName, background.buffer);
 
       if (storageError) {
@@ -56,6 +56,7 @@ export class TemplatesService {
       const template = await this.prismaService.template.create({
         data: {
           ...body,
+          defaultList: body.defaultList.split('/'),
           defaultBackground: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/templates/${fileName}`
         }
       });
@@ -70,14 +71,28 @@ export class TemplatesService {
 
   async updateTemplate(id: number, body: UpdateTemplateDto, background: Express.Multer.File): Promise<any> {
     try {
+      const checkTemplate = await this.prismaService.template.findUnique({
+        where: { id},
+      });
+      if (!checkTemplate) {
+        throw new NotFoundException("Template not found");
+      }
+
       let template = null;
       let fileName = null;
+      if(body.defaultList) {
+        body = {
+          ...body,
+          defaultList: body.defaultList.split('/')
+        }
+      }
+
       if (background) {
         // create random file name
         fileName = `template-${Date.now()}`;
         // upload file
         const { error: storageError } = await this.supabase.storage
-          .from('avatars') // Bucket name
+          .from('templates') // Bucket name
           .upload(fileName, background.buffer);
 
         if (storageError) {
@@ -97,7 +112,7 @@ export class TemplatesService {
       } else {
         template = await this.prismaService.template.update({
           where: { id },
-          data: { ...body }
+          data: body
         });
       }
 

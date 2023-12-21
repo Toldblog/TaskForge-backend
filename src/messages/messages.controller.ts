@@ -8,7 +8,7 @@ import {
   Body,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards';
-import { RolesGuard } from 'src/common/guards';
+import { BoardGuard } from 'src/common/guards';
 import { ResponseInterceptor } from 'src/common/interceptors';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from '@prisma/client';
@@ -16,13 +16,14 @@ import { MessagesService } from './messages.service';
 import { CommentDto } from './dtos';
 
 @Controller('messages')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard)
 @UseInterceptors(ResponseInterceptor)
 export class MessagesController {
   constructor(private messagesService: MessagesService) {}
 
   @Post(':boardId')
-  commentOnCard(
+  @UseGuards(BoardGuard)
+  sendMessage(
     @GetUser() user: User,
     @Param('boardId', ParseIntPipe) boardId: number,
     @Body() comment: CommentDto,
