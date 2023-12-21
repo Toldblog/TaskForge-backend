@@ -28,6 +28,21 @@ export class BoardsController {
         }
     }
 
+    @Get('recent-boards')
+    async getRecentBoards(@GetUser() user: User): Promise<any> {
+        try {
+            const result = await this.crudService.getAll('boardMember', {
+                userId: user.id,
+                sort: "-viewRecentlyDate",
+                limit: 5
+            }, { board: true });
+
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     @Get('joined-boards')
     async getAllJoinBoards(@GetUser() user: User): Promise<any> {
         try {
@@ -48,7 +63,7 @@ export class BoardsController {
     @Get('joined-boards/:workspaceId')
     @UseGuards(WorkspaceGuard)
     async getAllJoinBoardsInWorkspace(
-        @GetUser() user: User, 
+        @GetUser() user: User,
         @Param('workspaceId', ParseIntPipe) workspaceId: number
     ): Promise<any> {
         try {
@@ -71,7 +86,7 @@ export class BoardsController {
 
     @Get(':id')
     @UseGuards(BoardGuard)
-    async getBoard(@Param('id', ParseIntPipe) id: number): Promise<any> {
+    async getBoard(@GetUser() user: User, @Param('id', ParseIntPipe) id: number): Promise<any> {
         try {
             const result = await this.crudService.getOne('board', id, {
                 lists: {
@@ -80,6 +95,12 @@ export class BoardsController {
                     }
                 },
                 boardMembers: true
+            });
+            await this.crudService.updateOne('boardMember', {
+                userId: user.id,
+                boardId: id
+            }, {
+                viewRecentlyDate: new Date()
             });
 
             return result;

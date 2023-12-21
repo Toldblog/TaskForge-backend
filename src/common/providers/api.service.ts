@@ -7,7 +7,7 @@ export class APIService {
   getFilterObj(options: any, model: string): any {
     const queryObj = { ...options };
 
-    const excludeFields = ['page', 'sort', 'limit', 'fields', 'page', 'limit'];
+    const excludeFields = ['page', 'sort', 'limit', 'fields'];
     excludeFields.forEach((el) => delete queryObj[el]);
 
     const prismaFilter = {};
@@ -53,7 +53,7 @@ export class APIService {
       return sortBy.map((field: string) => {
         const direction = field.startsWith('-') ? 'desc' : 'asc';
         const fieldName = field.replace(/^-/, '');
-        return { [fieldName]: direction };
+        return { [fieldName]: direction, nulls: 'last' };
       });
     } else {
       return { createdAt: 'asc' };
