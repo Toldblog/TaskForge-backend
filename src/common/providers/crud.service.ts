@@ -16,16 +16,15 @@ export class CRUDService {
     let doc = null;
 
     if (Object.keys(options).length > 0) {
-      const filter = this.apiService.getFilterObj(options);
+      const filter = this.apiService.getFilterObj(options, model);
       const sortBy = this.apiService.getSortObj(options);
-      const selectedFields = this.apiService.getSelectedFields(options);
+      // const selectedFields = this.apiService.getSelectedFields(options);
       const { skip, take } = this.apiService.getPagination(options);
 
       if (!include) {
         doc = await this.prismaService[prismaModel].findMany({
           where: filter,
           orderBy: sortBy,
-          select: selectedFields,
           skip,
           take,
         });
@@ -65,7 +64,7 @@ export class CRUDService {
     }
 
     if (!doc) {
-      throw new NotFoundException(`${model.toUpperCase()} not found`);
+      throw new NotFoundException(`${model[0].toUpperCase()}${model.slice(1)} not found`);
     }
 
     return {
@@ -103,7 +102,7 @@ export class CRUDService {
     }
 
     if (!doc) {
-      throw new NotFoundException(`${model.toUpperCase()} not found`);
+      throw new NotFoundException(`${model[0].toUpperCase()}${model.slice(1)} not found`);
     }
 
     return {
@@ -119,7 +118,7 @@ export class CRUDService {
     });
 
     if (!doc) {
-      throw new NotFoundException(`${model.toUpperCase()} not found`);
+      throw new NotFoundException(`${model[0].toUpperCase()}${model.slice(1)} not found`);
     }
 
     return null;

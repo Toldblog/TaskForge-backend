@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 export class APIService {
   constructor() { }
 
-  getFilterObj(options: any): any {
+  getFilterObj(options: any, model: string): any {
     const queryObj = { ...options };
 
     const excludeFields = ['page', 'sort', 'limit', 'fields', 'page', 'limit'];
@@ -21,7 +21,20 @@ export class APIService {
           }
         }
       } else {
-        prismaFilter[key] = queryObj[key];
+        if (key === 'search') {
+          prismaFilter['name'] = {
+            contains: queryObj[key],
+            mode: 'insensitive'
+          }
+          if (model.toLowerCase() === 'user') {
+            prismaFilter['email'] = {
+              contains: queryObj[key],
+              mode: 'insensitive'
+            }
+          }
+        } else {
+          prismaFilter[key] = queryObj[key];
+        }
       }
     }
 

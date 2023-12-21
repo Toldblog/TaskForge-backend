@@ -20,7 +20,7 @@ model User {
   passwordResetExpires DateTime?
   active               Boolean           @default(false)
   avatar               String?
-  role                 Role              @default(USER)
+  role                 String            @default("user")
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   boardMembers         BoardMember[]
@@ -65,12 +65,16 @@ model WorkspaceMember {
 
 model Template {
   id                Int      @id @unique @default(autoincrement())
+  name              String
+  description       String
+  type              String   @default("Business")
   defaultList       String[] @default(["To do", "In progress", "Done"])
   defaultBackground String
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   boards            Board[]
 
+  @@unique([name, type])
   @@map("templates")
 }
 
@@ -158,14 +162,14 @@ model CardAssignee {
 }
 
 model CardAttachment {
-  id         Int            @id @unique @default(autoincrement())
-  fileName   String
-  url        String
-  type       AttachmentType @default(FILE)
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
-  cardId     Int
-  card       Card           @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  id        Int            @id @unique @default(autoincrement())
+  fileName  String
+  url       String
+  type      AttachmentType @default(FILE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  cardId    Int
+  card      Card           @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   @@map("card_attachment")
 }
@@ -225,11 +229,6 @@ model Notification {
   workspace   Workspace?       @relation(fields: [workspaceId], references: [id])
 
   @@map("notifications")
-}
-
-enum Role {
-  USER
-  ADMIN
 }
 
 enum AttachmentType {

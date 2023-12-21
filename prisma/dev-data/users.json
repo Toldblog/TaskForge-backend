@@ -1,0 +1,106 @@
+[
+    {
+        "username": "steve",
+        "name": "Steve T. Scaife",
+        "email": "steve@example.com",
+        "role": "admin",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "aaray",
+        "name": "Aarav Lynn",
+        "email": "aarav@example.com",
+        "role": "admin",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "jonas",
+        "name": "Jonas Schmedtmann",
+        "email": "admin@natours.io",
+        "role": "admin",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "cristian",
+        "name": "Cristian Vega",
+        "email": "chris@example.com",
+        "role": "user",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "lourdes",
+        "name": "Lourdes Browning",
+        "email": "loulou@example.com",
+        "role": "user",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "sophie",
+        "name": "Sophie Louise Hart",
+        "email": "sophie@example.com",
+        "role": "user",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "ayla",
+        "name": "Ayla Cornell",
+        "email": "ayls@example.com",
+        "role": "user",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "leo",
+        "name": "Leo Gillespie",
+        "email": "leo@example.com",
+        "role": "user",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "jennifer",
+        "name": "Jennifer Hardy",
+        "email": "jennifer@example.com",
+        "role": "user",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "kate",
+        "name": "Kate Morrison",
+        "email": "kate@example.com",
+        "role": "user",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "eliana",
+        "name": "Eliana Stout",
+        "email": "eliana@example.com",
+        "role": "user",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "miyah",
+        "name": "Miyah Myles",
+        "email": "miyah@example.com",
+        "role": "admin",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    },
+    {
+        "username": "ben",
+        "name": "Ben Hadley",
+        "email": "ben@example.com",
+        "role": "user",
+        "active": true,
+        "password": "$2b$10$NufAT0whpweVvgUfo4aCCOLMjheZncKZt5Jlo.j11wgqmQJw4Am32"
+    }
+]

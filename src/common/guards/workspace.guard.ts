@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { Role } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Role } from './roles.enum';
 
 @Injectable()
 export class WorkspaceGuard implements CanActivate {

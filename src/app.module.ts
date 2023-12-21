@@ -13,6 +13,7 @@ import { GatewayModule } from './gateway/gateway.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CommentsModule } from './comments/comments.module';
 import { MessagesModule } from './messages/messages.module';
+import { TemplatesModule } from './templates/templates.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { MessagesModule } from './messages/messages.module';
     CommonModule,
     ConfigModule.forRoot({ isGlobal: true }),
     GatewayModule,
+    TemplatesModule,
   ],
   controllers: [],
   providers: [],

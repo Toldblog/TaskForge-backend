@@ -11,7 +11,7 @@ export class MessagesService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly appGateway: AppGateway,
-  ) {}
+  ) { }
 
   async sendMessage(
     userId: number,
@@ -31,7 +31,7 @@ export class MessagesService {
       // Check if user is in board
       const checkUser = await this.prismaService.boardMember.findUnique({
         where: {
-          userId_boardId: {
+          id: {
             userId,
             boardId,
           },
