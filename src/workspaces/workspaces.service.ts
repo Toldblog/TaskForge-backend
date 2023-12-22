@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UtilService } from 'src/common/providers';
-import { AppGateway } from 'src/gateway/app.gateway';
+// import { AppGateway } from 'src/gateway/app.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -12,8 +12,8 @@ export class WorkspacesService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
-    private readonly appGateway: AppGateway
-  ) { }
+    // private readonly appGateway: AppGateway
+  ) {}
 
   async acceptInvitationLink(userId: number, token: string): Promise<any> {
     try {
@@ -30,14 +30,14 @@ export class WorkspacesService {
         where: { id: { userId, workspaceId: workspace.id } },
         create: {
           userId,
-          workspaceId: workspace.id
+          workspaceId: workspace.id,
         },
-        update: {}
+        update: {},
       });
 
       return {
-        workspace: this.utilService.filterResponse(workspace)
-      }
+        workspace: this.utilService.filterResponse(workspace),
+      };
     } catch (error) {
       throw error;
     }
@@ -71,9 +71,10 @@ export class WorkspacesService {
       await this.prismaService.workspaceMember.delete({
         where: {
           id: {
-            userId, workspaceId
-          }
-        }
+            userId,
+            workspaceId,
+          },
+        },
       });
 
       return null;
@@ -98,16 +99,16 @@ export class WorkspacesService {
         where: {
           id: {
             userId,
-            workspaceId
-          }
-        }
+            workspaceId,
+          },
+        },
       });
       if (workspace.adminIds.includes(userId)) {
         await this.prismaService.workspace.update({
           where: { id: workspaceId },
           data: {
-            adminIds: workspace.adminIds.filter(id => id !== userId)
-          }
+            adminIds: workspace.adminIds.filter((id) => id !== userId),
+          },
         });
       }
 
@@ -121,10 +122,10 @@ export class WorkspacesService {
         },
       });
 
-      this.appGateway.server.emit(`removeWorkspaceMember-${userId}`, {
-        adminName: adminName,
-        workspaceName: workspace.name,
-      });
+      // this.appGateway.server.emit(`removeWorkspaceMember-${userId}`, {
+      //   adminName: adminName,
+      //   workspaceName: workspace.name,
+      // });
     } catch (error) {
       throw error;
     }
@@ -148,16 +149,19 @@ export class WorkspacesService {
       }
 
       // check the user is already a member of the workspace
-      const workspaceMember = await this.prismaService.workspaceMember.findUnique({
-        where: {
-          id: {
-            userId,
-            workspaceId
-          }
-        }
-      });
+      const workspaceMember =
+        await this.prismaService.workspaceMember.findUnique({
+          where: {
+            id: {
+              userId,
+              workspaceId,
+            },
+          },
+        });
       if (!workspaceMember) {
-        throw new BadRequestException('The user is not a member of the workspace')
+        throw new BadRequestException(
+          'The user is not a member of the workspace',
+        );
       }
 
       // update workspace admins
@@ -177,11 +181,11 @@ export class WorkspacesService {
         },
       });
 
-      this.appGateway.server.emit(`addAdmin-${userId}`, {
-        adminName: adminName,
-        workspaceName: workspace.name,
-        workspaceId: workspace.id,
-      });
+      // this.appGateway.server.emit(`addAdmin-${userId}`, {
+      //   adminName: adminName,
+      //   workspaceName: workspace.name,
+      //   workspaceId: workspace.id,
+      // });
 
       return {
         workspace: this.utilService.filterResponse(updatedWorkspace),
@@ -220,8 +224,8 @@ export class WorkspacesService {
 
       return {
         results: users.length,
-        users: users
-      }
+        users: users,
+      };
     } catch (error) {
       throw error;
     }

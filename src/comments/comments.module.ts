@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { CommentsController } from './comments.controller';
 import { CommentsService } from './comments.service';
-import { GatewayModule } from 'src/gateway/gateway.module';
+// import { GatewayModule } from 'src/gateway/gateway.module';
 import { JwtModule } from '@nestjs/jwt';
-import { AppGateway } from 'src/gateway/app.gateway';
+// import { AppGateway } from 'src/gateway/app.gateway';
 
 @Module({
-  imports: [GatewayModule, JwtModule],
+  imports: [JwtModule],
   controllers: [CommentsController],
-  providers: [CommentsService, AppGateway]
+  providers: [CommentsService],
 })
-export class CommentsModule { }
+export class CommentsModule {}

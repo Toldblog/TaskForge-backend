@@ -3,12 +3,12 @@ import { BoardsController } from './boards.controller';
 import { BoardsService } from './boards.service';
 import { JwtModule } from '@nestjs/jwt';
 import { CRUDService } from 'src/common/providers';
-import { AppGateway } from 'src/gateway/app.gateway';
-import { GatewayModule } from 'src/gateway/gateway.module';
+// import { AppGateway } from 'src/gateway/app.gateway';
+// import { GatewayModule } from 'src/gateway/gateway.module';
 
 @Module({
-  imports: [GatewayModule, JwtModule],
+  imports: [JwtModule],
   controllers: [BoardsController],
-  providers: [BoardsService, CRUDService, AppGateway]
+  providers: [BoardsService, CRUDService],
 })
-export class BoardsModule { }
+export class BoardsModule {}

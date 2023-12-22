@@ -1,22 +1,18 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { AppGateway } from 'src/gateway/app.gateway';
+import { Message } from '@prisma/client';
 
 @Injectable()
 export class MessagesService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly appGateway: AppGateway,
-  ) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async sendMessage(
     userId: number,
-    userName: string,
     boardId: number,
     content: string,
-  ): Promise<any> {
+  ): Promise<Message> {
     try {
-      // Add comment
+      // Add messages
       const message = await this.prismaService.message.create({
         data: {
           userId,
@@ -24,26 +20,17 @@ export class MessagesService {
           content,
         },
       });
-
-      this.appGateway.server.emit(`message-${boardId}`, {
-        msg: `message-${boardId}`,
-        sender: userName,
-        content,
-      });
-
-      return {
-        message,
-      };
+      return message;
     } catch (error) {
       throw error;
     }
   }
 
-  async findAllMessages(userId: number): Promise<any> {
-    const res = await this.prismaService.message.findMany({
-      where: { userId }
+  async findAllMessages(boardId: number): Promise<any> {
+    const message = await this.prismaService.message.findMany({
+      where: { boardId },
     });
 
-    return res;
+    return { message };
   }
 }

@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { GatewayModule } from 'src/gateway/gateway.module';
 import { JwtModule } from '@nestjs/jwt';
-import { AppGateway } from 'src/gateway/app.gateway';
 import { MessagesController } from './messages.controller';
 import { MessagesService } from './messages.service';
 
 @Module({
-  imports: [GatewayModule, JwtModule],
+  imports: [JwtModule],
   controllers: [MessagesController],
-  providers: [MessagesService, AppGateway],
+  exports: [MessagesService],
+  providers: [MessagesService],
 })
 export class MessagesModule {}

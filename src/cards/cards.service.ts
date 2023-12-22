@@ -1,8 +1,13 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
 import { UtilService } from 'src/common/providers';
-import { AppGateway } from 'src/gateway/app.gateway';
+// import { AppGateway } from 'src/gateway/app.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
 
@@ -11,33 +16,41 @@ export class CardsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
-    private readonly appGateway: AppGateway,
-    private readonly configService: ConfigService
-  ) { }
+    // private readonly appGateway: AppGateway,
+    private readonly configService: ConfigService,
+  ) {}
 
   private supabase = createClient(
     this.configService.get('SUPABASE_URL'),
     this.configService.get('SUPABASE_API_KEY'),
   );
 
-  async exchangeCardOrders(listId: number, firstCardId: number, secondCardId: number): Promise<any> {
+  async exchangeCardOrders(
+    listId: number,
+    firstCardId: number,
+    secondCardId: number,
+  ): Promise<any> {
     try {
       let { cardsOrder } = await this.prismaService.list.findUnique({
-        where: { id: listId }
+        where: { id: listId },
       });
 
-      cardsOrder = this.utilService.swapTwoElementsInArray(cardsOrder, firstCardId, secondCardId);
+      cardsOrder = this.utilService.swapTwoElementsInArray(
+        cardsOrder,
+        firstCardId,
+        secondCardId,
+      );
       const list = await this.prismaService.list.update({
         where: { id: listId },
         data: {
-          cardsOrder
+          cardsOrder,
         },
-        include: { cards: true }
+        include: { cards: true },
       });
 
       return {
-        list: this.utilService.filterResponse(list)
-      }
+        list: this.utilService.filterResponse(list),
+      };
     } catch (error) {
       throw error;
     }
@@ -47,21 +60,21 @@ export class CardsService {
     try {
       const list = await this.prismaService.list.findFirst({
         where: {
-          cards: { some: { id: cardId } }
-        }
+          cards: { some: { id: cardId } },
+        },
       });
 
       // delete card
       await this.prismaService.card.delete({
-        where: { id: cardId }
+        where: { id: cardId },
       });
 
       // update cardsOrder of the list
       await this.prismaService.list.update({
         where: { id: list.id },
         data: {
-          cardsOrder: list.cardsOrder.filter(id => id !== cardId)
-        }
+          cardsOrder: list.cardsOrder.filter((id) => id !== cardId),
+        },
       });
 
       return null;
@@ -79,18 +92,18 @@ export class CardsService {
             some: {
               title: {
                 contains: search,
-                mode: 'insensitive'
-              }
-            }
-          }
+                mode: 'insensitive',
+              },
+            },
+          },
         },
-        include: { cards: true }
+        include: { cards: true },
       });
-      
+
       return {
         results: lists.length,
-        lists: lists.map(list => this.utilService.filterResponse(list))
-      }
+        lists: lists.map((list) => this.utilService.filterResponse(list)),
+      };
     } catch (error) {
       throw error;
     }
@@ -100,35 +113,37 @@ export class CardsService {
     try {
       const cardAssignee = await this.prismaService.cardAssignee.findUnique({
         where: {
-          id: { assigneeId: userId, cardId }
-        }
+          id: { assigneeId: userId, cardId },
+        },
       });
       if (cardAssignee) {
-        throw new BadRequestException("You already joined this card");
+        throw new BadRequestException('You already joined this card');
       }
 
       await this.prismaService.cardAssignee.create({
-        data: { assigneeId: userId, cardId }
+        data: { assigneeId: userId, cardId },
       });
 
       const card = await this.prismaService.card.findUnique({
         where: {
-          id: cardId
+          id: cardId,
         },
-        include: { cardAssignees: true }
+        include: { cardAssignees: true },
       });
 
       return {
-        card: this.utilService.filterResponse(card)
-      }
+        card: this.utilService.filterResponse(card),
+      };
     } catch (error) {
       throw error;
     }
   }
 
   async assignMemberToCard(
-    assignerId: number, assignerName: string,
-    cardId: number, assigneeId: number
+    assignerId: number,
+    assignerName: string,
+    cardId: number,
+    assigneeId: number,
   ): Promise<any> {
     try {
       // check if the assignee is in board
@@ -139,17 +154,19 @@ export class CardsService {
               some: {
                 cards: {
                   some: {
-                    id: cardId
-                  }
-                }
-              }
-            }
+                    id: cardId,
+                  },
+                },
+              },
+            },
           },
-          userId: assigneeId
-        }
+          userId: assigneeId,
+        },
       });
       if (!checkAssignee) {
-        throw new ForbiddenException('The assignee is not a member of the board.');
+        throw new ForbiddenException(
+          'The assignee is not a member of the board.',
+        );
       }
 
       // add new record to CardMember model if not exists
@@ -157,34 +174,40 @@ export class CardsService {
         where: { id: { assigneeId, cardId } },
         create: {
           assigneeId,
-          cardId
+          cardId,
         },
-        update: {}
+        update: {},
       });
 
       // add new notification
       const card = await this.prismaService.card.findUnique({
-        where: { id: cardId }
-      })
+        where: { id: cardId },
+      });
       await this.prismaService.notification.create({
         data: {
           type: 'ASSIGNMENT',
           senderId: assignerId,
           receiverId: assigneeId,
-          cardId
-        }
+          cardId,
+        },
       });
-      this.appGateway.server.emit(`assignCard-${assigneeId}`, {
-        assigner: assignerName,
-        cardTitle: card.title,
-        cardId: card.id
-      });
+      // this.appGateway.server.emit(`assignCard-${assigneeId}`, {
+      //   assigner: assignerName,
+      //   cardTitle: card.title,
+      //   cardId: card.id
+      // });
+      return {
+        card,
+      };
     } catch (error) {
       throw error;
     }
   }
 
-  async uploadAttachmentFile(id: number, attachment: Express.Multer.File): Promise<any> {
+  async uploadAttachmentFile(
+    id: number,
+    attachment: Express.Multer.File,
+  ): Promise<any> {
     try {
       // create random file name
       const fileName = attachment.originalname;
@@ -202,15 +225,20 @@ export class CardsService {
       const cardAttachment = await this.prismaService.cardAttachment.create({
         data: {
           fileName,
-          url: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/attachments/${fileName?.replace(/\s/g, '')}`,
+          url: `${this.configService.get(
+            'SUPABASE_URL',
+          )}/storage/v1/object/public/attachments/${fileName?.replace(
+            /\s/g,
+            '',
+          )}`,
           type: 'FILE',
-          cardId: id
-        }
+          cardId: id,
+        },
       });
 
       return {
-        attachment: cardAttachment
-      }
+        attachment: cardAttachment,
+      };
     } catch (error) {
       throw error;
     }
@@ -220,7 +248,7 @@ export class CardsService {
     try {
       // Check attachment
       const attachment = await this.prismaService.cardAttachment.findUnique({
-        where: { id: attachmentId }
+        where: { id: attachmentId },
       });
       if (!attachment) {
         throw new NotFoundException('Attachment not found');
@@ -234,21 +262,23 @@ export class CardsService {
               some: {
                 cards: {
                   some: {
-                    id: attachment.cardId
-                  }
-                }
-              }
-            }
-          }
-        }
+                    id: attachment.cardId,
+                  },
+                },
+              },
+            },
+          },
+        },
       });
       if (!boardMember) {
-        throw new ForbiddenException("You are not member of the board to do this request");
+        throw new ForbiddenException(
+          'You are not member of the board to do this request',
+        );
       }
 
       // delete attachment
       await this.prismaService.cardAttachment.delete({
-        where: { id: attachmentId }
+        where: { id: attachmentId },
       });
 
       return null;
@@ -257,11 +287,15 @@ export class CardsService {
     }
   }
 
-  async downloadFile(userId: number, attachmentId: number, res: Response): Promise<any> {
+  async downloadFile(
+    userId: number,
+    attachmentId: number,
+    res: Response,
+  ): Promise<any> {
     try {
       // Check attachment
       const attachment = await this.prismaService.cardAttachment.findUnique({
-        where: { id: attachmentId }
+        where: { id: attachmentId },
       });
       if (!attachment) {
         throw new NotFoundException('Attachment not found');
@@ -275,22 +309,24 @@ export class CardsService {
               some: {
                 cards: {
                   some: {
-                    id: attachment.cardId
-                  }
-                }
-              }
-            }
-          }
-        }
+                    id: attachment.cardId,
+                  },
+                },
+              },
+            },
+          },
+        },
       });
       if (!boardMember) {
-        throw new ForbiddenException("You are not member of the board to do this request");
+        throw new ForbiddenException(
+          'You are not member of the board to do this request',
+        );
       }
 
       // donwload file
       const { data, error } = await this.supabase.storage
         .from('attachments')
-        .download(attachment.fileName)
+        .download(attachment.fileName);
 
       if (error) {
         throw new Error(error.message);
