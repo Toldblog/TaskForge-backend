@@ -7,7 +7,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
 import { UtilService } from 'src/common/providers';
-// import { AppGateway } from 'src/gateway/app.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
 
@@ -16,9 +15,8 @@ export class CardsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
-    // private readonly appGateway: AppGateway,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   private supabase = createClient(
     this.configService.get('SUPABASE_URL'),
@@ -140,8 +138,6 @@ export class CardsService {
   }
 
   async assignMemberToCard(
-    assignerId: number,
-    assignerName: string,
     cardId: number,
     assigneeId: number,
   ): Promise<any> {
@@ -182,22 +178,13 @@ export class CardsService {
       // add new notification
       const card = await this.prismaService.card.findUnique({
         where: { id: cardId },
+        include: {
+          cardAssignees: true
+        }
       });
-      await this.prismaService.notification.create({
-        data: {
-          type: 'ASSIGNMENT',
-          senderId: assignerId,
-          receiverId: assigneeId,
-          cardId,
-        },
-      });
-      // this.appGateway.server.emit(`assignCard-${assigneeId}`, {
-      //   assigner: assignerName,
-      //   cardTitle: card.title,
-      //   cardId: card.id
-      // });
+
       return {
-        card,
+        card: this.utilService.filterResponse(card),
       };
     } catch (error) {
       throw error;

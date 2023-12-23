@@ -168,7 +168,7 @@ export class BoardsController {
     @Post("share-board")
     @UseGuards(BoardGuard)
     shareBoard(@GetUser() user: User, @Body() body: ShareBoardDto): any {
-        return this.boardService.shareBoard(user.id, user.name, body);
+        return this.boardService.shareBoard(body);
     }
 
     @Delete("leave-board/:id")

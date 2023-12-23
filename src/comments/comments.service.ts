@@ -4,7 +4,6 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { UtilService } from 'src/common/providers';
-// import { AppGateway } from 'src/gateway/app.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -12,7 +11,6 @@ export class CommentsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
-    // private readonly appGateway: AppGateway
   ) {}
 
   async deleteComment(userId: number, commentId: number): Promise<any> {
@@ -84,7 +82,6 @@ export class CommentsService {
 
   async commentOnCard(
     userId: number,
-    userName: string,
     cardId: number,
     content: string,
   ): Promise<any> {
@@ -124,31 +121,26 @@ export class CommentsService {
       });
 
       // Find all userIDs assigned to the card
-      const cardAssignees = await this.prismaService.cardAssignee.findMany({
-        where: { cardId },
-      });
-      const assigneeIds = cardAssignees
-        .map((item) => item.assigneeId)
-        .filter((id) => id !== userId);
-      assigneeIds?.forEach(async (assigneeId) => {
-        // add new notification
-        await this.prismaService.notification.create({
-          data: {
-            type: 'COMMENT',
-            senderId: userId,
-            receiverId: assigneeId,
-            cardId,
-          },
-        });
-        // this.appGateway.server.emit(`comment-${assigneeId}`, {
-        //     commentatorName: userName,
-        //     cardTitle: card.title,
-        //     cardId
-        // });
-      });
+      // const cardAssignees = await this.prismaService.cardAssignee.findMany({
+      //   where: { cardId },
+      // });
+      // const assigneeIds = cardAssignees
+      //   .map((item) => item.assigneeId)
+      //   .filter((id) => id !== userId);
+      // assigneeIds?.forEach(async (assigneeId) => {
+      //   // add new notification
+      //   await this.prismaService.notification.create({
+      //     data: {
+      //       type: 'COMMENT',
+      //       senderId: userId,
+      //       receiverId: assigneeId,
+      //       cardId,
+      //     },
+      //   });
+      // });
 
       return {
-        comment,
+        comment
       };
     } catch (error) {
       throw error;

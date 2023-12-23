@@ -45,7 +45,8 @@ export class CRUDService {
 
     return {
       results: doc.length,
-      [model + 's']: doc.map((item) => this.utilService.filterResponse(item))
+      [model + 's']: (model.toLowerCase() === "comment" || model.toLowerCase() === "notification") ? doc :
+        doc.map((item) => this.utilService.filterResponse(item))
     };
   }
 
@@ -68,7 +69,8 @@ export class CRUDService {
     }
 
     return {
-      [model]: this.utilService.filterResponse(doc)
+      [model]: (model.toLowerCase() === "comment" || model.toLowerCase() === "notification") ? doc :
+        this.utilService.filterResponse(doc)
     };
   }
 
@@ -80,7 +82,8 @@ export class CRUDService {
     });
 
     return {
-      [model]: this.utilService.filterResponse(doc)
+      [model]: (model.toLowerCase() === "comment" || model.toLowerCase() === "notification") ? doc :
+        this.utilService.filterResponse(doc)
     };
   }
 
@@ -106,7 +109,8 @@ export class CRUDService {
     }
 
     return {
-      [model]: this.utilService.filterResponse(doc)
+      [model]: (model.toLowerCase() === "comment" || model.toLowerCase() === "notification") ? doc :
+        this.utilService.filterResponse(doc)
     };
   }
 

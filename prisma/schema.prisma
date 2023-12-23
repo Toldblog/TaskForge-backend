@@ -20,7 +20,7 @@ model User {
   passwordResetExpires DateTime?
   active               Boolean           @default(false)
   avatar               String?
-  role                 String            @default("user")
+  role                 Role              @default(USER)
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   boardMembers         BoardMember[]
@@ -34,6 +34,11 @@ model User {
   workspaceMembers     WorkspaceMember[]
 
   @@map("users")
+}
+
+enum Role {
+  USER  @map("user")
+  ADMIN @map("admin")
 }
 
 model Workspace {
@@ -64,18 +69,25 @@ model WorkspaceMember {
 }
 
 model Template {
-  id                Int      @id @unique @default(autoincrement())
+  id                Int          @id @unique @default(autoincrement())
   name              String
   description       String
-  type              String   @default("Business")
-  defaultList       String[] @default(["To do", "In progress", "Done"])
+  type              TemplateType @default(BUSINESS)
+  defaultList       String[]     @default([])
   defaultBackground String
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
   boards            Board[]
 
   @@unique([name, type])
   @@map("templates")
+}
+
+enum TemplateType {
+  BUSINESS    @map("Businees")
+  DESIGN      @map("Design")
+  EDUCATION   @map("Education")
+  ENGINEERING @map("Engineering")
 }
 
 model Board {
@@ -174,6 +186,11 @@ model CardAttachment {
   @@map("card_attachment")
 }
 
+enum AttachmentType {
+  FILE @map("FILE")
+  LINK @map("LINK")
+}
+
 model Comment {
   id        Int      @id @unique @default(autoincrement())
   content   String
@@ -214,7 +231,7 @@ model CardActivity {
 
 model Notification {
   id          Int              @id @unique @default(autoincrement())
-  type        NotificationType @default(ASSIGNMENT)
+  type        NotificationType @default(COMMENT)
   senderId    Int
   receiverId  Int
   workspaceId Int?
@@ -222,7 +239,7 @@ model Notification {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   boardId     Int?
-  boards      Board?           @relation(fields: [boardId], references: [id])
+  board      Board?           @relation(fields: [boardId], references: [id])
   card        Card?            @relation(fields: [cardId], references: [id])
   receiver    User             @relation("receive_notification", fields: [receiverId], references: [id])
   sender      User             @relation("send_notification", fields: [senderId], references: [id])
@@ -231,15 +248,10 @@ model Notification {
   @@map("notifications")
 }
 
-enum AttachmentType {
-  FILE
-  LINK
-}
-
 enum NotificationType {
-  ADD_ADMIN
-  REMOVE
-  ASSIGNMENT
-  COMMENT
-  ADD_TO_BOARD
+  ADD_ADMIN        @map("ADD_ADMIN")
+  REMOVE_WORKSPACE @map("REMOVE_WORKSPACE")
+  ASSIGNMENT       @map("ASSIGNMENT")
+  COMMENT          @map("COMMENT")
+  ADD_TO_BOARD     @map("ADD_TO_BOARD")
 }

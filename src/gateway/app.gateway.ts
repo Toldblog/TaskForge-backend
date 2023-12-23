@@ -35,7 +35,7 @@ export class AppGateway implements OnModuleInit {
       payload.boardId,
       payload.content,
     );
-    console.log(message);
+
     this.server.emit(`message-${message.boardId}`, {
       msg: `message-${payload.boardId}`,
       sender: user.username,

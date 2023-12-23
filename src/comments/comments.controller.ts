@@ -54,7 +54,7 @@ export class CommentsController {
         @Param('cardId', ParseIntPipe) cardId: number,
         @Body() comment: CommentDto
     ): any {
-        return this.commentsService.commentOnCard(user.id, user.name, cardId, comment.content);
+        return this.commentsService.commentOnCard(user.id, cardId, comment.content);
     }
 
     @Delete(':id')

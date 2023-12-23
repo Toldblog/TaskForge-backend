@@ -159,7 +159,7 @@ export class WorkspacesController {
         @Param('workspaceId', ParseIntPipe) workspaceId: number,
         @Param('userId', ParseIntPipe) userId: number
     ): any {
-        return this.workspaceService.removeWorkspaceMember(admin.id, admin.name, workspaceId, userId);
+        return this.workspaceService.removeWorkspaceMember(workspaceId, userId);
     }
 
     @Patch(':workspaceId/add-admin/:userId')

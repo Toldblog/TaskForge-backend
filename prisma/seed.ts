@@ -1,16 +1,28 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role, TemplateType } from "@prisma/client";
 import templatesData from './dev-data/templates.json';
 import usersData from './dev-data/users.json';
 
 const prisma = new PrismaClient();
 
-// async function cleanModel(model: string) {
-//     await prisma[model].deleteMany({})
-// }
+async function addTemplates() {
+    const data = templatesData.map(template => ({
+        ...template,
+        type: TemplateType[template.type.toUpperCase()]
+    }));
+    await prisma.template.createMany({ data });
+}
+
+async function addUsers() {
+    const data = usersData.map(user => ({
+        ...user,
+        role: Role[user.role.toUpperCase()]
+    }));
+    await prisma.user.createMany({ data });
+}
 
 async function main() {
-    await prisma.template.createMany({ data: templatesData });
-    await prisma.user.createMany({ data: usersData });
+    await addTemplates();
+    await addUsers();
 }
 
 main()

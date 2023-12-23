@@ -7,14 +7,12 @@ import { UtilService } from 'src/common/providers';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBoardDto, ShareBoardDto } from './dtos';
 import * as crypto from 'crypto';
-// import { AppGateway } from 'src/gateway/app.gateway';
 
 @Injectable()
 export class BoardsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
-    // private readonly appGateway: AppGateway
   ) {}
 
   async createBoard(userId: number, body: CreateBoardDto): Promise<any> {
@@ -77,11 +75,7 @@ export class BoardsService {
     }
   }
 
-  async shareBoard(
-    adderId: number,
-    adderName: string,
-    body: ShareBoardDto,
-  ): Promise<any> {
+  async shareBoard(body: ShareBoardDto): Promise<any> {
     try {
       const boardMember = await this.prismaService.boardMember.findUnique({
         where: {
@@ -98,25 +92,6 @@ export class BoardsService {
       await this.prismaService.boardMember.create({
         data: body,
       });
-
-      // add new notification
-      await this.prismaService.notification.create({
-        data: {
-          type: 'ADD_TO_BOARD',
-          senderId: adderId,
-          receiverId: body.userId,
-          boardId: body.boardId,
-        },
-      });
-
-      // const board = await this.prismaService.board.findUnique({
-      //     where: { id: body.boardId }
-      // });
-      // this.appGateway.server.emit(`addToBoard-${body.userId}`, {
-      //     creatorName: adderName,
-      //     boardName: board.name,
-      //     boardId: board.id
-      // });
 
       const result = await this.prismaService.board.findUnique({
         where: { id: body.boardId },

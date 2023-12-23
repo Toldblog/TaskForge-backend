@@ -84,8 +84,6 @@ export class WorkspacesService {
   }
 
   async removeWorkspaceMember(
-    adminId: number,
-    adminName: string,
     workspaceId: number,
     userId: number,
   ): Promise<any> {
@@ -112,20 +110,7 @@ export class WorkspacesService {
         });
       }
 
-      // add new notification
-      await this.prismaService.notification.create({
-        data: {
-          type: 'REMOVE',
-          senderId: adminId,
-          receiverId: userId,
-          workspaceId,
-        },
-      });
-
-      // this.appGateway.server.emit(`removeWorkspaceMember-${userId}`, {
-      //   adminName: adminName,
-      //   workspaceName: workspace.name,
-      // });
+      return null;
     } catch (error) {
       throw error;
     }
@@ -172,19 +157,13 @@ export class WorkspacesService {
         },
       });
       // add new notification
-      await this.prismaService.notification.create({
-        data: {
-          type: 'ADD_ADMIN',
-          senderId: adminId,
-          receiverId: userId,
-          workspaceId,
-        },
-      });
-
-      // this.appGateway.server.emit(`addAdmin-${userId}`, {
-      //   adminName: adminName,
-      //   workspaceName: workspace.name,
-      //   workspaceId: workspace.id,
+      // await this.prismaService.notification.create({
+      //   data: {
+      //     type: 'ADD_ADMIN',
+      //     senderId: adminId,
+      //     receiverId: userId,
+      //     workspaceId,
+      //   },
       // });
 
       return {

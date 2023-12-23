@@ -154,7 +154,7 @@ export class CardsController {
   @Post('assign')
   @UseGuards(CardGuard)
   assignMemberToCard(@GetUser() assigner: User, @Body() body: AssignCardDto): any {
-    return this.cardsService.assignMemberToCard(assigner.id, assigner.name, body.cardId, body.assigneeId);
+    return this.cardsService.assignMemberToCard(body.cardId, body.assigneeId);
   }
 
   @Post('upload-file/:id')

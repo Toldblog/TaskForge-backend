@@ -1,5 +1,4 @@
 import { IsOptional, IsString } from "class-validator";
-import { TemplateType } from "./template-type.enum";
 
 export class UpdateTemplateDto {
     @IsOptional()
@@ -12,7 +11,7 @@ export class UpdateTemplateDto {
 
     @IsOptional()
     @IsString()
-    type: TemplateType;
+    type: string;
 
     @IsOptional()
     @IsString()

@@ -22,7 +22,7 @@ export class WsGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient<Socket>();
     const token = this.extractTokenFromHeader(client);
-    console.log(client.handshake.headers);
+
     if (!token) {
       throw new UnauthorizedException();
     }

@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UtilService } from 'src/common/providers';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
+import { TemplateType } from '@prisma/client';
 
 @Injectable()
 export class TemplatesService {
@@ -22,7 +23,7 @@ export class TemplatesService {
     try {
       const templates = await this.prismaService.template.findMany({
         where: {
-          type: templateType,
+          type: TemplateType.BUSINESS,
           name: {
             contains: search,
             mode: 'insensitive'
@@ -56,6 +57,7 @@ export class TemplatesService {
       const template = await this.prismaService.template.create({
         data: {
           ...body,
+          type: TemplateType[body.type.toUpperCase()],
           defaultList: body.defaultList.split('/'),
           defaultBackground: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/templates/${fileName}`
         }
@@ -72,7 +74,7 @@ export class TemplatesService {
   async updateTemplate(id: number, body: UpdateTemplateDto, background: Express.Multer.File): Promise<any> {
     try {
       const checkTemplate = await this.prismaService.template.findUnique({
-        where: { id},
+        where: { id },
       });
       if (!checkTemplate) {
         throw new NotFoundException("Template not found");
@@ -80,7 +82,7 @@ export class TemplatesService {
 
       let template = null;
       let fileName = null;
-      if(body.defaultList) {
+      if (body.defaultList) {
         body = {
           ...body,
           defaultList: body.defaultList.split('/')
@@ -106,13 +108,17 @@ export class TemplatesService {
           where: { id },
           data: {
             ...body,
+            type: body.type ? TemplateType[body.type.toUpperCase()] : checkTemplate.type,
             defaultBackground: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/templates/${fileName}`
           }
         });
       } else {
         template = await this.prismaService.template.update({
           where: { id },
-          data: body
+          data: {
+            ...body,
+            type: body.type ? TemplateType[body.type.toUpperCase()] : checkTemplate.type
+          }
         });
       }
 
