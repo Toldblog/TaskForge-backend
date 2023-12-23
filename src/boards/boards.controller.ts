@@ -96,12 +96,15 @@ export class BoardsController {
                 },
                 boardMembers: true
             });
-            await this.crudService.updateOne('boardMember', {
-                userId: user.id,
-                boardId: id
-            }, {
-                viewRecentlyDate: new Date()
-            });
+            const { board } = result;
+            if (user.role !== 'ADMIN' && board.boardMembers?.some(member => member.id === user.id)) {
+                await this.crudService.updateOne('boardMember', {
+                    userId: user.id,
+                    boardId: id
+                }, {
+                    viewRecentlyDate: new Date()
+                });
+            }
 
             return result;
         } catch (error) {

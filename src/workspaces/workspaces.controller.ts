@@ -36,13 +36,11 @@ export class WorkspacesController {
     @Get('my-workspaces')
     async getMyWorkspaces(@GetUser() user: User): Promise<any> {
         try {
-            const result = await this.crudService.getAll('workspace', {
-                workspaceMembers: {
-                    some: {
-                        userId: user.id
-                    }
-                }
-            }, { boards: true });
+            const result = await this.crudService.getAll('workspaceMember', {
+                userId: user.id
+            }, {
+                workspace: { include: { boards: true } }
+            });
 
             return result;
         } catch (error) {

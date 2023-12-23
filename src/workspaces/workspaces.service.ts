@@ -13,7 +13,7 @@ export class WorkspacesService {
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
     // private readonly appGateway: AppGateway
-  ) {}
+  ) { }
 
   async acceptInvitationLink(userId: number, token: string): Promise<any> {
     try {
