@@ -1,0 +1,42 @@
+[
+  {
+    "userId": 1,
+    "workspaceId": 1
+  },
+  {
+    "userId": 2,
+    "workspaceId": 1
+  },
+  {
+    "userId": 2,
+    "workspaceId": 2
+  },
+  {
+    "userId": 3,
+    "workspaceId": 2
+  },
+  {
+    "userId": 3,
+    "workspaceId": 3
+  },
+  {
+    "userId": 4,
+    "workspaceId": 4
+  },
+  {
+    "userId": 5,
+    "workspaceId": 4
+  },
+  {
+    "userId": 6,
+    "workspaceId": 4
+  },
+  {
+    "userId": 12,
+    "workspaceId": 5
+  },
+  {
+    "userId": 13,
+    "workspaceId": 5
+  }
+]

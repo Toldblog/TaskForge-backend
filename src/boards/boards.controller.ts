@@ -27,7 +27,7 @@ export class BoardsController {
   constructor(
     private boardService: BoardsService,
     private crudService: CRUDService,
-  ) {}
+  ) { }
 
   @Get()
   @Roles(Role.ADMIN)
@@ -50,7 +50,11 @@ export class BoardsController {
           sort: '-viewRecentlyDate',
           limit: 5,
         },
-        { board: true },
+        {
+          board: {
+            include: { workspace: true }
+          }
+        },
       );
 
       return result;
@@ -69,7 +73,7 @@ export class BoardsController {
         },
         {
           board: {
-            include: { lists: true },
+            include: { workspace: true },
           },
         },
       );
@@ -115,8 +119,16 @@ export class BoardsController {
       const result = await this.crudService.getOne('board', id, {
         lists: {
           include: {
-            cards: true,
-          },
+            cards: {
+              include: {
+                cardAttachments: true,
+                cardAssignees: {
+                  include: { assignee: true }
+                },
+                comments: true
+              }
+            }
+          }
         },
         boardMembers: {
           include: {
@@ -248,5 +260,11 @@ export class BoardsController {
   @Get('accept-invitation-link/:token')
   acceptInvitationLink(@GetUser() user: User, @Param('token') token: string): any {
     return this.boardService.acceptInvitationLink(user.id, token);
+  }
+
+  @Get(":id/members")
+  @UseGuards(BoardGuard)
+  getWorkspaceMembers(@Param('id', ParseIntPipe) id: number, @Query('search') search: string): any {
+    return this.boardService.getBoardMembers(id, search ? search : '');
   }
 }

@@ -13,7 +13,7 @@ export class BoardsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
-  ) {}
+  ) { }
 
   async createBoard(userId: number, body: CreateBoardDto): Promise<any> {
     try {
@@ -134,6 +134,42 @@ export class BoardsService {
 
       return {
         board: this.utilService.filterResponse(board),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getBoardMembers(boardId: number, search: string): Promise<any> {
+    try {
+      let users = await this.prismaService.user.findMany({
+        where: {
+          boardMembers: {
+            some: {
+              boardId,
+            },
+          },
+          OR: [
+            {
+              name: {
+                mode: 'insensitive',
+                contains: search,
+              },
+            },
+            {
+              username: {
+                mode: 'insensitive',
+                contains: search,
+              },
+            },
+          ],
+        },
+      });
+      users = users.map((user) => this.utilService.filterUserResponse(user));
+
+      return {
+        results: users.length,
+        users: users,
       };
     } catch (error) {
       throw error;

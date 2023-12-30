@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UtilService } from 'src/common/providers';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -36,13 +36,19 @@ export class ListsService {
         }
     }
 
-    async exchangeListOrders(boardId: number, firstListId: number, secondListId: number): Promise<any> {
+    async moveList(boardId: number, listId: number, newIndex: number): Promise<any> {
         try {
             let { listsOrder } = await this.prismaService.board.findUnique({
                 where: { id: boardId }
             });
 
-            listsOrder = this.utilService.swapTwoElementsInArray(listsOrder, firstListId, secondListId);
+            listsOrder = listsOrder.filter(id => id !== listId);
+            listsOrder = [
+                ...listsOrder.slice(0, newIndex),
+                listId,
+                ...listsOrder.slice(newIndex)
+            ]
+
             const board = await this.prismaService.board.update({
                 where: { id: boardId },
                 data: {
@@ -50,7 +56,17 @@ export class ListsService {
                 },
                 include: {
                     lists: {
-                        include: { cards: true }
+                        include: {
+                            cards: {
+                                include: {
+                                    cardAttachments: true,
+                                    cardAssignees: {
+                                        include: { assignee: true }
+                                    },
+                                    comments: true
+                                }
+                            }
+                        }
                     }
                 }
             });
@@ -129,6 +145,69 @@ export class ListsService {
             return {
                 list: result
             }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async moveAllCardsInList(listId: number, destinationListId: number): Promise<any> {
+        try {
+            const destinationList = await this.prismaService.list.findUnique({
+                where: { id: destinationListId }
+            });
+            if (!destinationList) {
+                throw new NotFoundException("Destination list not found");
+            }
+
+            const list = await this.prismaService.list.findUnique({
+                where: { id: listId },
+                include: { cards: true }
+            });
+
+            const len = list.cards.length;
+            const cardsOrder = [...destinationList.cardsOrder];
+            for (let i = 0; i < len; i++) {
+                // update listId of card
+                await this.prismaService.card.update({
+                    where: { id: list.cards[i].id },
+                    data: { listId: destinationListId }
+                });
+                cardsOrder.push(list.cards[i].id);
+            }
+            // update cardsOrder of currentList and destinationList
+            await this.prismaService.list.update({
+                where: { id: listId },
+                data: { cardsOrder: [] },
+            });
+
+            const updatedList = await this.prismaService.list.update({
+                where: { id: destinationListId },
+                data: { cardsOrder },
+                include: { cards: true }
+            });
+
+            return {
+                list: this.utilService.filterResponse(updatedList)
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async deleteAllCardsInList(listId: number): Promise<any> {
+        try {
+            await this.prismaService.card.deleteMany({
+                where: {
+                    listId: listId
+                }
+            });
+
+            await this.prismaService.list.update({
+                where: { id: listId },
+                data: { cardsOrder: [] }
+            });
+
+            return null;
         } catch (error) {
             throw error;
         }
