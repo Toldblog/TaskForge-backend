@@ -254,13 +254,22 @@ export class CardsService {
     }
   }
 
+
+  private getFileNameAndExtension(filename) {
+    const name = filename.substring(0, filename.lastIndexOf('.'));
+    const extension = filename.substring(filename.lastIndexOf('.') + 1, filename.length);
+    return { name, extension };
+  }
+
+
   async uploadAttachmentFile(
     id: number,
     attachment: Express.Multer.File,
   ): Promise<any> {
     try {
       // create random file name
-      const fileName = attachment.originalname + '_' + Date.now().toString();
+      const { name, extension } = this.getFileNameAndExtension(attachment.originalname);
+      const fileName = `${name}_${Date.now().toString()}.${extension}`;
 
       // upload file
       const { error: storageError } = await this.supabase.storage
