@@ -11,6 +11,8 @@ export class CRUDService {
     private utilService: UtilService,
   ) { }
 
+  private notFilteredModels = ["comment", "notification", "message"];
+
   async getAll(model: string, options: any, include: object = null): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
     let doc = null;
@@ -45,7 +47,7 @@ export class CRUDService {
 
     return {
       results: doc.length,
-      [model + 's']: (model.toLowerCase() === "comment" || model.toLowerCase() === "notification") ? doc :
+      [model + 's']: (this.notFilteredModels.includes(model.toLowerCase())) ? doc :
         doc.map((item) => this.utilService.filterResponse(item))
     };
   }
@@ -69,20 +71,19 @@ export class CRUDService {
     }
 
     return {
-      [model]: (model.toLowerCase() === "comment" || model.toLowerCase() === "notification") ? doc :
+      [model]: (this.notFilteredModels.includes(model.toLowerCase())) ? doc :
         this.utilService.filterResponse(doc)
     };
   }
 
   async createOne(model: string, body: any): Promise<any> {
     const prismaModel = this.apiService.getModel(model);
-
     const doc = await this.prismaService[prismaModel].create({
       data: body,
     });
 
     return {
-      [model]: (model.toLowerCase() === "comment" || model.toLowerCase() === "notification") ? doc :
+      [model]: (this.notFilteredModels.includes(model.toLowerCase())) ? doc :
         this.utilService.filterResponse(doc)
     };
   }
@@ -109,7 +110,7 @@ export class CRUDService {
     }
 
     return {
-      [model]: (model.toLowerCase() === "comment" || model.toLowerCase() === "notification") ? doc :
+      [model]: (this.notFilteredModels.includes(model.toLowerCase())) ? doc :
         this.utilService.filterResponse(doc)
     };
   }

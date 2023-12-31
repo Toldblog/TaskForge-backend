@@ -1,6 +1,6 @@
 export * from './create-card.dto'
 export * from './update-card.dto'
-export * from './exchange-card-orders.dto'
 export * from './move-card.dto'
 export * from './assign-card.dto'
 export * from './upload-link.dto'
+export * from './move-card-another-list.dto'

@@ -23,25 +23,75 @@ export class CardsService {
     this.configService.get('SUPABASE_API_KEY'),
   );
 
-  async exchangeCardOrders(
+  async moveCardInList(
     listId: number,
-    firstCardId: number,
-    secondCardId: number,
+    cardId: number,
+    newIndex: number,
   ): Promise<any> {
     try {
       let { cardsOrder } = await this.prismaService.list.findUnique({
         where: { id: listId },
       });
 
-      cardsOrder = this.utilService.swapTwoElementsInArray(
-        cardsOrder,
-        firstCardId,
-        secondCardId,
-      );
+      cardsOrder = cardsOrder.filter(id => id !== cardId);
+      cardsOrder = [
+        ...cardsOrder.slice(0, newIndex),
+        cardId,
+        ...cardsOrder.slice(newIndex)
+      ]
+
       const list = await this.prismaService.list.update({
         where: { id: listId },
         data: {
           cardsOrder,
+        },
+        include: { cards: true },
+      });
+
+      return {
+        list: this.utilService.filterResponse(list),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async moveCardToAnotherList(
+    cardId: number,
+    oldListId: number,
+    newListId: number,
+    newIndex: number,
+  ): Promise<any> {
+    try {
+      // Update listId of card
+      await this.prismaService.card.update({
+        where: { id: cardId },
+        data: { listId: newListId }
+      });
+
+      // Update cardsOrder of old list
+      const { cardsOrder } = await this.prismaService.list.findUnique({
+        where: { id: oldListId },
+      });
+      await this.prismaService.list.update({
+        where: { id: oldListId },
+        data: { cardsOrder: cardsOrder.filter(id => id !== cardId) }
+      });
+
+      // Update cardsOrder for new list
+      let { cardsOrder: newCardsOrder } = await this.prismaService.list.findUnique({
+        where: { id: newListId },
+      });
+      newCardsOrder = [
+        ...newCardsOrder.slice(0, newIndex),
+        cardId,
+        ...newCardsOrder.slice(newIndex)
+      ]
+
+      const list = await this.prismaService.list.update({
+        where: { id: newListId },
+        data: {
+          cardsOrder: newCardsOrder,
         },
         include: { cards: true },
       });
@@ -143,7 +193,7 @@ export class CardsService {
   ): Promise<any> {
     try {
       // check if the assignee is in board
-      const checkAssignee = await this.prismaService.boardMember.findFirst({
+      const checkAssigneeInBoard = await this.prismaService.boardMember.findFirst({
         where: {
           board: {
             lists: {
@@ -159,37 +209,58 @@ export class CardsService {
           userId: assigneeId,
         },
       });
-      if (!checkAssignee) {
+      if (!checkAssigneeInBoard) {
         throw new ForbiddenException(
           'The assignee is not a member of the board.',
         );
       }
 
-      // add new record to CardMember model if not exists
-      await this.prismaService.cardAssignee.upsert({
-        where: { id: { assigneeId, cardId } },
-        create: {
-          assigneeId,
-          cardId,
-        },
-        update: {},
-      });
-
-      // add new notification
-      const card = await this.prismaService.card.findUnique({
-        where: { id: cardId },
-        include: {
-          cardAssignees: true
+      // check if the assignee is already assigned to card
+      const checkAssignee = await this.prismaService.cardAssignee.findUnique({
+        where: {
+          id: { assigneeId, cardId }
         }
       });
 
-      return {
-        card: this.utilService.filterResponse(card),
-      };
+      if (checkAssignee) {
+        // remove out of card
+        await this.prismaService.cardAssignee.delete({
+          where: { id: { assigneeId, cardId } }
+        });
+        return null;
+      } else {
+        // add new record to CardMember model if not exists
+        await this.prismaService.cardAssignee.create({
+          data: {
+            assigneeId,
+            cardId,
+          }
+        });
+
+        // add new notification
+        const card = await this.prismaService.card.findUnique({
+          where: { id: cardId },
+          include: {
+            cardAssignees: true
+          }
+        });
+
+        return {
+          card: this.utilService.filterResponse(card),
+        };
+      }
     } catch (error) {
       throw error;
     }
   }
+
+
+  private getFileNameAndExtension(filename) {
+    const name = filename.substring(0, filename.lastIndexOf('.'));
+    const extension = filename.substring(filename.lastIndexOf('.') + 1, filename.length);
+    return { name, extension };
+  }
+
 
   async uploadAttachmentFile(
     id: number,
@@ -197,7 +268,8 @@ export class CardsService {
   ): Promise<any> {
     try {
       // create random file name
-      const fileName = attachment.originalname;
+      const { name, extension } = this.getFileNameAndExtension(attachment.originalname);
+      const fileName = `${name}_${Date.now().toString()}.${extension}`;
 
       // upload file
       const { error: storageError } = await this.supabase.storage
@@ -224,7 +296,7 @@ export class CardsService {
       });
 
       return {
-        attachment: cardAttachment,
+        cardAttachment: cardAttachment,
       };
     } catch (error) {
       throw error;

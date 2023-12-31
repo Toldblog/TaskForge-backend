@@ -20,7 +20,7 @@ import { ResponseInterceptor } from 'src/common/interceptors';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from '@prisma/client';
 import { CRUDService } from 'src/common/providers';
-import { AssignCardDto, CreateCardDto, ExchangeCardOrdersDto, MoveCardDto, UpdateCardDto, UploadLinkDto } from './dtos';
+import { AssignCardDto, CreateCardDto, MoveCardAnotherListDto, MoveCardDto, UpdateCardDto, UploadLinkDto } from './dtos';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 
@@ -48,7 +48,16 @@ export class CardsController {
   @UseGuards(CardGuard)
   async getCard(@Param('id', ParseIntPipe) id: number): Promise<any> {
     try {
-      const result = await this.crudService.getOne('card', id);
+      const result = await this.crudService.getOne('card', id, {
+        list: true,
+        cardAttachments: true,
+        cardAssignees: {
+          include: {
+            assignee: true
+          }
+        },
+        comments: true
+      });
       return result;
     } catch (error) {
       throw error;
@@ -74,33 +83,16 @@ export class CardsController {
     }
   }
 
-  @Patch('exchange-orders')
+  @Patch('move-card-in-list')
   @UseGuards(ListGuard)
-  exchangeCardOrders(@Body() body: ExchangeCardOrdersDto): any {
-    return this.cardsService.exchangeCardOrders(body.listId, body.firstCardId, body.secondCardId);
+  moveCardInList(@Body() body: MoveCardDto): any {
+    return this.cardsService.moveCardInList(body.listId, body.cardId, body.newIndex);
   }
 
-  @Patch('move-card/:id')
+  @Patch('move-card-another-list/:id')
   @UseGuards(ListGuard, CardGuard)
-  async moveCard(@Param('id', ParseIntPipe) id: number, @Body() body: MoveCardDto): Promise<any> {
-    try {
-      const result = await this.crudService.updateOne('card', id, { listId: body.listId });
-
-      // Update cardsOrder of the list
-      const { list } = await this.crudService.getOne('list', body.listId);
-      const index = body.order - 1;
-      await this.crudService.updateOne('list', body.listId, {
-        cardsOrder: [
-          ...list.cardsOrder.slice(0, index),
-          id,
-          ...list.cardsOrder.slice(index)
-        ]
-      });
-
-      return result;
-    } catch (error) {
-      throw error;
-    }
+  moveCardToAnotherList(@Param('id', ParseIntPipe) id: number, @Body() body: MoveCardAnotherListDto): any {
+    return this.cardsService.moveCardToAnotherList(id, body.oldListId, body.newListId, body.newIndex);
   }
 
   @Patch(':id')

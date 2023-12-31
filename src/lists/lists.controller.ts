@@ -44,7 +44,15 @@ export class ListsController {
     @UseGuards(ListGuard)
     async getList(@Param('id', ParseIntPipe) id: number): Promise<any> {
         try {
-            const result = await this.crudService.getOne("list", id, { cards: true });
+            const result = await this.crudService.getOne("list", id, { 
+                cards: {
+                    include: {
+                        cardAttachments: true,
+                        cardAssignees: true,
+                        comments: true
+                    }
+                } 
+            });
             return result
         } catch (error) {
             throw error;
@@ -70,10 +78,10 @@ export class ListsController {
         }
     }
 
-    @Patch('exchange-orders')
+    @Patch('move-list')
     @UseGuards(BoardGuard)
     moveList(@Body() body: ExchangeListOrdersDto): any {
-        return this.listsService.exchangeListOrders(body.boardId, body.firstListId, body.secondListId);
+        return this.listsService.moveList(body.boardId, body.listId, body.newIndex);
     }
 
     @Patch(':id')
@@ -97,5 +105,17 @@ export class ListsController {
     @UseGuards(ListGuard)
     copyList(@Param('id', ParseIntPipe) id: number, @Body() body: { name: string }): any {
         return this.listsService.copyList(id, body.name);
+    }
+
+    @Patch('move-all-cards/:id')
+    @UseGuards(ListGuard)
+    moveAllCardsInList(@Param('id', ParseIntPipe) id: number, @Body() body: { destinationListId: number }): any {
+        return this.listsService.moveAllCardsInList(id, body.destinationListId);
+    }
+
+    @Delete('all-cards/:id')
+    @UseGuards(ListGuard)
+    deleteAllCardsInList(@Param('id', ParseIntPipe) id: number): any {
+        return this.listsService.deleteAllCardsInList(id);
     }
 }

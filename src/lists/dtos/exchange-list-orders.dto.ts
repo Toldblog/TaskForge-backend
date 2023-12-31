@@ -7,9 +7,9 @@ export class ExchangeListOrdersDto {
 
     @IsNotEmpty()
     @IsNumber()
-    firstListId: number;
+    listId: number;
 
     @IsNotEmpty()
     @IsNumber()
-    secondListId: number;
+    newIndex: number;
 }

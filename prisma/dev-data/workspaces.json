@@ -1,0 +1,32 @@
+[
+  {
+    "name": "steve's workspace",
+    "adminIds": [1, 2],
+    "inviteToken": null,
+    "description": "Here, we can focus on our tasks, projects, and ideas in a flexible and organized manner."
+  },
+  {
+    "name": "aaray's workspace",
+    "adminIds": [2, 3],
+    "inviteToken": null,
+    "description": "Here, we can focus on our tasks, projects, and ideas in a flexible and organized manner."
+  },
+  {
+    "name": "jonas's workspace",
+    "adminIds": [3],
+    "inviteToken": null,
+    "description": "Here, we can focus on our tasks, projects, and ideas in a flexible and organized manner."
+  },
+  {
+    "name": "cristian's workspace",
+    "adminIds": [4, 5, 6],
+    "inviteToken": null,
+    "description": "Here, we can focus on our tasks, projects, and ideas in a flexible and organized manner."
+  },
+  {
+    "name": "miyah's workspace",
+    "adminIds": [12, 13],
+    "inviteToken": null,
+    "description": "Here, we can focus on our tasks, projects, and ideas in a flexible and organized manner."
+  }
+]

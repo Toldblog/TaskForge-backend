@@ -1,13 +1,13 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class MoveCardDto {
+export class MoveCardAnotherListDto {
     @IsNotEmpty()
     @IsNumber()
-    listId: number;
+    oldListId: number;
 
     @IsNotEmpty()
     @IsNumber()
-    cardId: number;
+    newListId: number;
 
     @IsNotEmpty()
     @IsNumber()

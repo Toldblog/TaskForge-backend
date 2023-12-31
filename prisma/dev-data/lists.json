@@ -1,0 +1,216 @@
+[
+  {
+    "name": "New Lead 🙋",
+    "boardId": 1,
+    "cardsOrder": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "name": "Discovery call 🤝",
+    "boardId": 1,
+    "cardsOrder": [
+      4,
+      5
+    ]
+  },
+  {
+    "name": "Proposal review 🔎",
+    "boardId": 1,
+    "cardsOrder": [
+      6
+    ]
+  },
+  {
+    "name": "Processed",
+    "boardId": 1,
+    "cardsOrder": [
+      7,
+      8
+    ]
+  },
+  {
+    "name": "Future follow-up 🔮",
+    "boardId": 1,
+    "cardsOrder": [
+      9
+    ]
+  },
+  {
+    "name": "1. Problem",
+    "boardId": 2,
+    "cardsOrder": [
+      10,
+      11,
+      12
+    ]
+  },
+  {
+    "name": "2. Customer Segments",
+    "boardId": 2,
+    "cardsOrder": [
+      13,
+      14
+    ]
+  },
+  {
+    "name": "3. Unique Value Propositions",
+    "boardId": 2,
+    "cardsOrder": [
+      15,
+      16
+    ]
+  },
+  {
+    "name": "4. Solution",
+    "boardId": 2,
+    "cardsOrder": []
+  },
+  {
+    "name": "5. Unfair Advantage",
+    "boardId": 2,
+    "cardsOrder": []
+  },
+  {
+    "name": "6. Revenue Streams",
+    "boardId": 2,
+    "cardsOrder": []
+  },
+  {
+    "name": "7. Cost Structure",
+    "boardId": 2,
+    "cardsOrder": []
+  },
+  {
+    "name": "8. Key Metrics",
+    "boardId": 2,
+    "cardsOrder": []
+  },
+  {
+    "name": "9. Channels",
+    "boardId": 2,
+    "cardsOrder": []
+  },
+  {
+    "name": "New Lead 🙋",
+    "boardId": 3,
+    "cardsOrder": []
+  },
+  {
+    "name": "Discovery call 🤝",
+    "boardId": 3,
+    "cardsOrder": []
+  },
+  {
+    "name": "Proposal review 🔎",
+    "boardId": 3,
+    "cardsOrder": []
+  },
+  {
+    "name": "Processed",
+    "boardId": 3,
+    "cardsOrder": []
+  },
+  {
+    "name": "Future follow-up 🔮",
+    "boardId": 3,
+    "cardsOrder": []
+  },
+  {
+    "name": "1. Problem",
+    "boardId": 4,
+    "cardsOrder": []
+  },
+  {
+    "name": "2. Customer Segments",
+    "boardId": 4,
+    "cardsOrder": []
+  },
+  {
+    "name": "3. Unique Value Propositions",
+    "boardId": 4,
+    "cardsOrder": []
+  },
+  {
+    "name": "4. Solution",
+    "boardId": 4,
+    "cardsOrder": []
+  },
+  {
+    "name": "5. Unfair Advantage",
+    "boardId": 4,
+    "cardsOrder": []
+  },
+  {
+    "name": "6. Revenue Streams",
+    "boardId": 4,
+    "cardsOrder": []
+  },
+  {
+    "name": "7. Cost Structure",
+    "boardId": 4,
+    "cardsOrder": []
+  },
+  {
+    "name": "8. Key Metrics",
+    "boardId": 4,
+    "cardsOrder": []
+  },
+  {
+    "name": "9. Channels",
+    "boardId": 4,
+    "cardsOrder": []
+  },
+  {
+    "name": "New Lead 🙋",
+    "boardId": 5,
+    "cardsOrder": []
+  },
+  {
+    "name": "Discovery call 🤝",
+    "boardId": 5,
+    "cardsOrder": []
+  },
+  {
+    "name": "Proposal review 🔎",
+    "boardId": 5,
+    "cardsOrder": []
+  },
+  {
+    "name": "Processed",
+    "boardId": 5,
+    "cardsOrder": []
+  },
+  {
+    "name": "Future follow-up 🔮",
+    "boardId": 5,
+    "cardsOrder": []
+  },
+  {
+    "name": "New Lead 🙋",
+    "boardId": 6,
+    "cardsOrder": []
+  },
+  {
+    "name": "Discovery call 🤝",
+    "boardId": 6,
+    "cardsOrder": []
+  },
+  {
+    "name": "Proposal review 🔎",
+    "boardId": 6,
+    "cardsOrder": []
+  },
+  {
+    "name": "Processed",
+    "boardId": 6,
+    "cardsOrder": []
+  },
+  {
+    "name": "Future follow-up 🔮",
+    "boardId": 6,
+    "cardsOrder": []
+  }
+]
