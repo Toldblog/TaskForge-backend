@@ -124,9 +124,12 @@ export class BoardsController {
           },
         },
       });
-      const { board } = result;
-      if (board.boardMembers?.some((member) => member.userId === user.id)) {
-        const curMember = await this.crudService.updateOne(
+      const creatorIdx = result.board.boardMembers?.findIndex((member) => member.userId === result.board.creatorId);
+      const [creator] = result.board.boardMembers.splice(creatorIdx, 1);
+      result.board.creator = creator;
+      const curIdx = result.board.boardMembers?.findIndex((member) => member.userId === user.id);
+      if (curIdx !== -1 || result.board.creatorId === user.id) {
+        await this.crudService.updateOne(
           'boardMember',
           {
             userId: user.id,
@@ -136,11 +139,13 @@ export class BoardsController {
             viewRecentlyDate: new Date(),
           },
         );
-        result.board.curMember = curMember.boardMember;
+        if (result.board.creatorId !== user.id) {
+          const [cur] = result.board.boardMembers.splice(curIdx, 1);
+          result.board.curMember = cur;
+        } else result.board.curMember = creator;
       } else {
         result.board.curMember = null;
       }
-
       return result;
     } catch (error) {
       throw error;
