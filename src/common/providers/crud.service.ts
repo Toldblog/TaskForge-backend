@@ -11,7 +11,7 @@ export class CRUDService {
     private utilService: UtilService,
   ) { }
 
-  private notFilteredModels = ["comment", "notification", "message"];
+  private notFilteredModels = ["comment", "notification", "message", "cardAttachment"];
 
   async getAll(model: string, options: any, include: object = null): Promise<any> {
     const prismaModel = this.apiService.getModel(model);

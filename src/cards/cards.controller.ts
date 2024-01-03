@@ -20,7 +20,7 @@ import { ResponseInterceptor } from 'src/common/interceptors';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from '@prisma/client';
 import { CRUDService } from 'src/common/providers';
-import { AssignCardDto, CreateCardDto, MoveCardAnotherListDto, MoveCardDto, UpdateCardDto, UploadLinkDto } from './dtos';
+import { AssignCardDto, CopyCardDto, CreateCardDto, MoveCardAnotherListDto, MoveCardDto, UpdateAttachmentDto, UpdateCardDto, UploadLinkDto } from './dtos';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 
@@ -178,7 +178,22 @@ export class CardsController {
   }
 
   @Get('download-file/:attachmentId')
-  downloadFile(@GetUser() user: User, @Param('attachmentId', ParseIntPipe) attachmentId: number, @Res() res: Response): void {
-    this.cardsService.downloadFile(user.id, attachmentId, res);
+  downloadFile(@Param('attachmentId', ParseIntPipe) attachmentId: number, @Res() res: Response): void {
+    this.cardsService.downloadFile(attachmentId, res);
+  }
+
+  @Patch('update-attachment/:attachmentId')
+  updateAttachment(
+    @GetUser() user: User,
+    @Param('attachmentId', ParseIntPipe) attachmentId: number,
+    @Body() body: UpdateAttachmentDto
+  ): any {
+    return this.cardsService.updateAttachment(user.id, attachmentId, body);
+  }
+
+  @Post('copy-card/:id')
+  @UseGuards(ListGuard, CardGuard)
+  copyCard(@Param('id', ParseIntPipe) id: number, @Body() { keepMembers, keepAttachments, listId, title }: CopyCardDto): any {
+    return this.cardsService.copyCard(id, keepMembers, keepAttachments, listId, title);
   }
 }

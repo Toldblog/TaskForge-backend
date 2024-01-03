@@ -21,6 +21,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
+        if (request.route.path.includes('/cards/download-file')) {
+            return true;
+        }
+
         const token = this.extractTokenFromHeader(request);
         if (!token) {
             throw new UnauthorizedException();

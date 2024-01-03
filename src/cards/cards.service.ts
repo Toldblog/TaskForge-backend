@@ -9,6 +9,7 @@ import { createClient } from '@supabase/supabase-js';
 import { UtilService } from 'src/common/providers';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Response } from 'express';
+import { UpdateAttachmentDto } from './dtos';
 
 @Injectable()
 export class CardsService {
@@ -261,7 +262,6 @@ export class CardsService {
     return { name, extension };
   }
 
-
   async uploadAttachmentFile(
     id: number,
     attachment: Express.Multer.File,
@@ -283,7 +283,7 @@ export class CardsService {
       // add new record to CardAttachment model
       const cardAttachment = await this.prismaService.cardAttachment.create({
         data: {
-          fileName,
+          fileName: attachment.originalname,
           url: `${this.configService.get(
             'SUPABASE_URL',
           )}/storage/v1/object/public/attachments/${fileName?.replace(
@@ -346,11 +346,7 @@ export class CardsService {
     }
   }
 
-  async downloadFile(
-    userId: number,
-    attachmentId: number,
-    res: Response,
-  ): Promise<any> {
+  async updateAttachment(userId: number, attachmentId: number, body: UpdateAttachmentDto): Promise<any> {
     try {
       // Check attachment
       const attachment = await this.prismaService.cardAttachment.findUnique({
@@ -382,11 +378,57 @@ export class CardsService {
         );
       }
 
-      // donwload file
+      // update attachment
+      const cardAttachment = await this.prismaService.cardAttachment.update({
+        where: { id: attachmentId },
+        data: body
+      });
+
+      return { cardAttachment };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async downloadFile(
+    attachmentId: number,
+    res: Response,
+  ): Promise<any> {
+    try {
+      // Check attachment
+      const attachment = await this.prismaService.cardAttachment.findUnique({
+        where: { id: attachmentId },
+      });
+      if (!attachment) {
+        throw new NotFoundException('Attachment not found');
+      }
+      // Check user permission
+      // const boardMember = await this.prismaService.boardMember.findFirst({
+      //   where: {
+      //     userId,
+      //     board: {
+      //       lists: {
+      //         some: {
+      //           cards: {
+      //             some: {
+      //               id: attachment.cardId,
+      //             },
+      //           },
+      //         },
+      //       },
+      //     },
+      //   },
+      // });
+      // if (!boardMember) {
+      //   throw new ForbiddenException(
+      //     'You are not member of the board to do this request',
+      //   );
+      // }
+
+      // download file
       const { data, error } = await this.supabase.storage
         .from('attachments')
         .download(attachment.fileName);
-
       if (error) {
         throw new Error(error.message);
       }
@@ -398,6 +440,71 @@ export class CardsService {
         'Content-Disposition': `attachment; filename="${attachment.fileName}"`,
       });
       res.send(buffer);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async copyCard(id: number, keepMembers: boolean, keepAttachments: boolean, listId: number, title: string = null): Promise<any> {
+    try {
+      const card = await this.prismaService.card.findUnique({
+        where: { id },
+        include: {
+          cardAssignees: true,
+          cardAttachments: true,
+        }
+      });
+
+      const copiedCard = await this.prismaService.card.create({
+        data: {
+          title: title || card.title,
+          description: card.description,
+          listId,
+        }
+      });
+
+      // update cardsOrder for the list
+      const list = await this.prismaService.list.findUnique({
+        where: { id: listId }
+      });
+      await this.prismaService.list.update({
+        where: { id: listId },
+        data: { cardsOrder: [...list.cardsOrder, copiedCard.id] }
+      })
+
+      if (keepMembers) {
+        const assigneesLen = card.cardAssignees.length;
+        for (let i = 0; i < assigneesLen; i++) {
+          await this.prismaService.cardAssignee.create({
+            data: {
+              assigneeId: card.cardAssignees[i].assigneeId,
+              cardId: copiedCard.id
+            }
+          })
+        }
+      }
+      if (keepAttachments) {
+        const attachmentsLen = card.cardAttachments.length;
+        for (let i = 0; i < attachmentsLen; i++) {
+          await this.prismaService.cardAttachment.create({
+            data: {
+              fileName: card.cardAttachments[i].fileName,
+              url: card.cardAttachments[i].url,
+              type: card.cardAttachments[i].type,
+              cardId: copiedCard.id
+            }
+          });
+        }
+      }
+
+      const result = await this.prismaService.card.findUnique({
+        where: { id: copiedCard.id },
+        include: { cardAssignees: true, cardAttachments: true }
+      });
+
+      return {
+        card: this.utilService.filterResponse(result)
+      }
     } catch (error) {
       throw error;
     }
