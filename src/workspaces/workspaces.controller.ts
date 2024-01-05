@@ -41,6 +41,7 @@ export class WorkspacesController {
             }, {
                 workspace: {
                     include: {
+                        workspaceMembers: true,
                         boards: {
                             include: {
                                 boardMembers: true

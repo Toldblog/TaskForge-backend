@@ -51,6 +51,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
                 throw new UnauthorizedException("Your password has already been changed.");
             }
 
+            if(!user.active) {
+                throw new UnauthorizedException("This account is not active.");
+            }
+
             // 💡 We're assigning the payload to the request object here
             // so that we can access it in our route handlers
             delete user.password, user.active, user.passwordResetToken, user.passwordResetExpires;

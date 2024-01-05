@@ -32,7 +32,7 @@ export class MailService {
     }
 
     async sendEmailResetPassword(email: string, resetToken: string): Promise<void> {
-        const url = `${this.configService.get('BASE_URL')}/api/auth/reset-password/${resetToken}`;
+        const url = `${this.configService.get('CLIENT_URL')}/reset-password/${resetToken}`;
 
         await this.mailerService.sendMail({
             to: email,
