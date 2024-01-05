@@ -35,14 +35,17 @@ export class CommentsController {
     async getCommentsByCard(@Param('cardId', ParseIntPipe) cardId: number): Promise<any> {
         try {
             let result = await this.crudService.getAll('comment', {
-                cardId
+                cardId,
+                sort: '-updatedAt',
             }, { commenter: true });
 
             result = result['comments'].map(comment => ({
                 ...comment,
                 commenter: this.utilService.filterUserResponse(comment.commenter)
             }));
-            return result;
+            return {
+                comments: result
+            };
         } catch (error) {
             throw error;
         }

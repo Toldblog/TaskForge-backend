@@ -7,7 +7,7 @@ import {
 export class CreateBoardDto {
     @IsNotEmpty()
     @IsString()
-    @MaxLength(20)
+    @MaxLength(50)
     name: string;
 
     @IsNotEmpty()

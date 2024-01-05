@@ -158,6 +158,18 @@ export class BoardsController {
       } else {
         result.board.curMember = null;
       }
+
+      if (result.board.closed) {
+        return {
+          board: {
+            id: result.board.id,
+            name: result.board.name,
+            creatorId: result.board.creatorId,
+            background: result.board.background,
+            closed: result.board.closed
+          }
+        }
+      }
       return result;
     } catch (error) {
       throw error;
@@ -181,6 +193,20 @@ export class BoardsController {
           },
         },
       });
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Delete(':boardId/remove-board-member/:userId')
+  @UseGuards(BoardGuard)
+  async removeBoardMember(
+    @Param('boardId', ParseIntPipe) boardId: number,
+    @Param('userId', ParseIntPipe) userId: number
+  ): Promise<any> {
+    try {
+      const result = await this.crudService.deleteOne('boardMember', { boardId, userId });
       return result;
     } catch (error) {
       throw error;

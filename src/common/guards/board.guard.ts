@@ -32,7 +32,10 @@ export class BoardGuard implements CanActivate {
             throw new NotFoundException("Board not found");
         }
         if (board.closed && !Object.keys(request.body).includes('closed')) {
-            throw new ForbiddenException("This board is already closed");
+            if ((request.method === "GET" || request.method === "DELETE") && request.route.path.includes('/boards/:id')) 
+                return true;
+            else
+                throw new ForbiddenException("This board is already closed");
         }
 
         // If ADMIN accesses the route, return true

@@ -236,10 +236,11 @@ model Notification {
   receiverId  Int
   workspaceId Int?
   cardId      Int?
+  isRead      Boolean          @default(false)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   boardId     Int?
-  board      Board?           @relation(fields: [boardId], references: [id])
+  board       Board?           @relation(fields: [boardId], references: [id])
   card        Card?            @relation(fields: [cardId], references: [id])
   receiver    User             @relation("receive_notification", fields: [receiverId], references: [id])
   sender      User             @relation("send_notification", fields: [senderId], references: [id])

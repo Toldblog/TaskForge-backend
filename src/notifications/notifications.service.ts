@@ -24,7 +24,8 @@ export class NotificationsService {
                     ...body,
                     senderId: userId,
                     type: NotificationType[body.type.toUpperCase()]
-                }
+                },
+                include: { sender: true, card: true, board: true, workspace: true }
             });
 
             return { notification }
@@ -54,6 +55,19 @@ export class NotificationsService {
             });
 
             return null;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async readNotification(id: number, isRead: boolean): Promise<any> {
+        try {
+            const notification = await this.prismaService.notification.update({
+                where: { id },
+                data: { isRead }
+            });
+
+            return { notification };
         } catch (error) {
             throw error;
         }

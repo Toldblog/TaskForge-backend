@@ -39,7 +39,15 @@ export class WorkspacesController {
             const result = await this.crudService.getAll('workspaceMember', {
                 userId: user.id
             }, {
-                workspace: { include: { boards: true } }
+                workspace: {
+                    include: {
+                        boards: {
+                            include: {
+                                boardMembers: true
+                            }
+                        }
+                    }
+                }
             });
 
             return result;

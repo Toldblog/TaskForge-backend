@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CRUDService } from 'src/common/providers';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from 'src/auth/guards';
@@ -32,11 +32,16 @@ export class NotificationsController {
             const result = await this.crudService.getAll('notification', {
                 receiverId: user.id,
                 sort: "-createdAt"
-            }, { board: true, workspace: true, card: true });
+            }, { board: true, workspace: true, card: true, sender: true });
 
             return result;
         } catch (error) {
             throw error;
         }
+    }
+
+    @Patch('read-notification/:id')
+    readNotifications(@Param('id', ParseIntPipe) id: number, @Body() body: { isRead: boolean }): any {
+        return this.notificationsService.readNotification(id, body.isRead);
     }
 }

@@ -6,6 +6,8 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { Message, User } from '@prisma/client';
 import { MessageDto } from 'src/messages/dtos';
 import { MessagesService } from 'src/messages/messages.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { CreateNotificationDto } from 'src/notifications/dtos';
 
 @WebSocketGateway({
   cors: { origin: '*' },
@@ -15,7 +17,10 @@ export class AppGateway implements OnModuleInit {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly notificationsService: NotificationsService
+  ) { }
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
@@ -40,5 +45,13 @@ export class AppGateway implements OnModuleInit {
     });
 
     return { event: 'sendMessage', data: message };
+  }
+
+  @SubscribeMessage('createNotification')
+  async createNotification(@GetUser() user: User, @MessageBody() body: CreateNotificationDto): Promise<WsResponse<Message>> {
+    const { notification } = await this.notificationsService.createNotification(user.id, body);
+    this.server.emit(`notification-${notification.receiverId}`, notification);
+
+    return { event: 'createNotification', data: notification };
   }
 }

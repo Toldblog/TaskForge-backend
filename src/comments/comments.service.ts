@@ -22,10 +22,10 @@ export class CommentsService {
       if (!comment) {
         throw new NotFoundException('Comment not found');
       }
-      // check comment's editing permission
+      // check comment's deleting permission
       if (comment.userId !== userId) {
         throw new ForbiddenException(
-          'You are not allowed to edit this comment',
+          'You are not allowed to deleting this comment',
         );
       }
 
