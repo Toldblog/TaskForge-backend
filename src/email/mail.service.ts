@@ -122,7 +122,7 @@ export class MailService {
     }
 
     async sendWorkspaceInvitation(email: string, senderName: string, workspace: Workspace): Promise<void> {
-        const url = `https://frontend-domain.com/workspace/${workspace.id}`;
+        const url = `${this.configService.get('CLIENT_URL')}/w/${workspace.id}/home`;
 
         await this.mailerService.sendMail({
             to: email,

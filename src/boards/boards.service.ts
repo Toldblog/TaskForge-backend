@@ -175,4 +175,36 @@ export class BoardsService {
       throw error;
     }
   }
+
+  async outOfBoard(userId: number, boardId: number): Promise<any> {
+    try {
+      const boardMember = await this.prismaService.boardMember.findUnique({
+        where: { id: { userId, boardId } }
+      });
+      if (!boardMember) {
+        throw new BadRequestException('The user is not a member of this board');
+      }
+
+      // delete boardMember
+      await this.prismaService.boardMember.delete({
+        where: { id: { userId, boardId } }
+      });
+
+      // delete all cardAssignee that the user joined
+      await this.prismaService.cardAssignee.deleteMany({
+        where: {
+          assigneeId: userId,
+          card: {
+            list: {
+              boardId
+            }
+          }
+        }
+      });
+
+      return null;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

@@ -11,6 +11,7 @@ export class UtilService {
 
   public filterUserResponse(user: User): any {
     const response = this.filterResponse(user);
+    response.havePassword = !!response.password;
 
     delete response.password;
     delete response.passwordConfirm;

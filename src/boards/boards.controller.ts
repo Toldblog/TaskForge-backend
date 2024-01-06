@@ -201,16 +201,11 @@ export class BoardsController {
 
   @Delete(':boardId/remove-board-member/:userId')
   @UseGuards(BoardGuard)
-  async removeBoardMember(
+  removeBoardMember(
     @Param('boardId', ParseIntPipe) boardId: number,
     @Param('userId', ParseIntPipe) userId: number
-  ): Promise<any> {
-    try {
-      const result = await this.crudService.deleteOne('boardMember', { boardId, userId });
-      return result;
-    } catch (error) {
-      throw error;
-    }
+  ): any {
+    return this.boardService.outOfBoard(userId, boardId);
   }
 
   @Delete(':id')
@@ -254,17 +249,8 @@ export class BoardsController {
 
   @Delete('leave-board/:id')
   @UseGuards(BoardGuard)
-  async leaveBoard(@GetUser() user: User, @Param('id', ParseIntPipe) boardId: number): Promise<any> {
-    try {
-      const result = await this.crudService.deleteOne('boardMember', {
-        userId: user.id,
-        boardId,
-      });
-
-      return result;
-    } catch (error) {
-      throw error;
-    }
+  leaveBoard(@GetUser() user: User, @Param('id', ParseIntPipe) boardId: number): any {
+    return this.boardService.outOfBoard(user.id, boardId);
   }
 
   @Patch('starred-board/:boardId')

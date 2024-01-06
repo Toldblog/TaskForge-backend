@@ -97,13 +97,12 @@ export class AuthService {
     }
   }
 
-  async googleLogin(user: User): Promise<{ user: any, havePassword: boolean, accessToken: string }> {
+  async googleLogin(user: User): Promise<{ user: any, accessToken: string }> {
     const userRes = this.utilService.filterUserResponse(user);
     const accessToken = await this.generateAccessToken(user.id);
 
     return {
       user: userRes,
-      havePassword: !!user.password,
       accessToken
     };
   }

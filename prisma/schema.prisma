@@ -77,7 +77,6 @@ model Template {
   defaultBackground String
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
-  boards            Board[]
 
   @@unique([name, type])
   @@map("templates")
@@ -104,8 +103,7 @@ model Board {
   inviteToken   String?
   listsOrder    Int[]          @default([])
   boardMembers  BoardMember[]
-  users         User           @relation(fields: [creatorId], references: [id])
-  template      Template       @relation(fields: [templateId], references: [id])
+  creator       User           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   lists         List[]
   messages      Message[]
@@ -240,11 +238,11 @@ model Notification {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   boardId     Int?
-  board       Board?           @relation(fields: [boardId], references: [id])
-  card        Card?            @relation(fields: [cardId], references: [id])
+  board       Board?           @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  card        Card?            @relation(fields: [cardId], references: [id], onDelete: Cascade)
   receiver    User             @relation("receive_notification", fields: [receiverId], references: [id])
   sender      User             @relation("send_notification", fields: [senderId], references: [id])
-  workspace   Workspace?       @relation(fields: [workspaceId], references: [id])
+  workspace   Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }

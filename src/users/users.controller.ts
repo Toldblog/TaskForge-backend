@@ -71,14 +71,17 @@ export class UsersController {
   }
 
   // CRUD API
-  @Roles(Role.ADMIN)
-  @Get() 
-  async getAllUsers(@Query() options: any): Promise<any> {
+  @Get()
+  async getAllUsers(@GetUser() user: User, @Query() options: any): Promise<any> {
     try {
       const result = await this.crudService.getAll('user', options);
+      if (user.role === 'USER') {
+        result['users'] = result['users'].filter(user => user.role === 'USER');
+      }
+
       return {
         results: result.results,
-        users: result['users'].map(user => this.utilService.filterUserResponse(user)) 
+        users: result['users'].map(user => this.utilService.filterUserResponse(user))
       }
     } catch (error) {
       throw error;

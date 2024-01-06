@@ -77,6 +77,29 @@ export class WorkspacesService {
         },
       });
 
+      // delete all cardAssignee that the user joined
+      await this.prismaService.cardAssignee.deleteMany({
+        where: {
+          assigneeId: userId,
+          card: {
+            list: {
+              board: {
+                workspaceId
+              }
+            }
+          }
+        }
+      });
+      // delete all boardMember that the user joined
+      await this.prismaService.boardMember.deleteMany({
+        where: {
+          userId,
+          board: {
+            workspace: { id: workspaceId }
+          }
+        }
+      });
+
       return null;
     } catch (error) {
       throw error;
@@ -109,6 +132,29 @@ export class WorkspacesService {
           },
         });
       }
+
+      // delete all cardAssignee that the user joined
+      await this.prismaService.cardAssignee.deleteMany({
+        where: {
+          assigneeId: userId,
+          card: {
+            list: {
+              board: {
+                workspaceId
+              }
+            }
+          }
+        }
+      });
+      // delete all boardMember that the user joined
+      await this.prismaService.boardMember.deleteMany({
+        where: {
+          userId,
+          board: {
+            workspace: { id: workspaceId }
+          }
+        }
+      });
 
       return null;
     } catch (error) {

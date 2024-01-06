@@ -25,7 +25,11 @@ export class NotificationsService {
                     senderId: userId,
                     type: NotificationType[body.type.toUpperCase()]
                 },
-                include: { sender: true, card: true, board: true, workspace: true }
+                include: { sender: true, card: {
+                    include: {
+                        list: true
+                    }
+                }, board: true, workspace: true }
             });
 
             return { notification }

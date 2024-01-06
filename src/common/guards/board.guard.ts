@@ -60,7 +60,8 @@ export class BoardGuard implements CanActivate {
                 throw new ForbiddenException("The board is only accessed by its members");
         } else if (
             (request.method === "PATCH" && request.route.path.includes("/boards/:id")) ||
-            (request.method === "DELETE" && request.route.path.includes("/boards/:id"))
+            (request.method === "DELETE" && request.route.path.includes("/boards/:id")) ||
+            (request.method === "DELETE" && request.route.path.includes("/:boardId/remove-board-member/:userId"))
         ) {
             if (board.creatorId !== user.id) {
                 throw new ForbiddenException("You are not the creator of this board");
