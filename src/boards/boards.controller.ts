@@ -176,6 +176,11 @@ export class BoardsController {
     }
   }
 
+  @Get('by-token/:token')
+  getBoardByToken(@Param('token') token: string): any {
+    return this.boardService.getBoardByToken(token);
+  }
+
   @Post()
   @UseGuards(WorkspaceGuard)
   createBoard(@GetUser() user: User, @Body() body: CreateBoardDto): any {

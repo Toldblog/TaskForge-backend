@@ -47,7 +47,7 @@ model Workspace {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   adminIds         Int[]
-  inviteToken      String?
+  inviteToken      String?           @unique
   description      String?
   boards           Board[]
   notifications    Notification[]
@@ -100,7 +100,7 @@ model Board {
   creatorId     Int
   workspaceId   Int
   templateId    Int
-  inviteToken   String?
+  inviteToken   String?        @unique
   listsOrder    Int[]          @default([])
   boardMembers  BoardMember[]
   creator       User           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
@@ -240,8 +240,8 @@ model Notification {
   boardId     Int?
   board       Board?           @relation(fields: [boardId], references: [id], onDelete: Cascade)
   card        Card?            @relation(fields: [cardId], references: [id], onDelete: Cascade)
-  receiver    User             @relation("receive_notification", fields: [receiverId], references: [id])
-  sender      User             @relation("send_notification", fields: [senderId], references: [id])
+  receiver    User             @relation("receive_notification", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender      User             @relation("send_notification", fields: [senderId], references: [id], onDelete: Cascade)
   workspace   Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@map("notifications")

@@ -15,6 +15,28 @@ export class WorkspacesService {
     // private readonly appGateway: AppGateway
   ) { }
 
+  async getWorkspaceByToken(token: string): Promise<any> {
+    try {
+      const workspace = await this.prismaService.workspace.findFirst({
+        where: {
+          inviteToken: token
+        }
+      });
+      if (!workspace) {
+        throw new NotFoundException("Workspace not found");
+      }
+
+      return {
+        workspace: {
+          id: workspace.id,
+          name: workspace.name
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async acceptInvitationLink(userId: number, token: string): Promise<any> {
     try {
       const workspace = await this.prismaService.workspace.findFirst({

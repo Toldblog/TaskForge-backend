@@ -15,6 +15,28 @@ export class BoardsService {
     private readonly utilService: UtilService,
   ) { }
 
+  async getBoardByToken(token: string): Promise<any> {
+    try {
+      const board = await this.prismaService.board.findFirst({
+        where: {
+          inviteToken: token
+        }
+      });
+      if (!board) {
+        throw new NotFoundException("Board not found");
+      }
+
+      return {
+        workspace: {
+          id: board.id,
+          name: board.name
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async createBoard(userId: number, body: CreateBoardDto): Promise<any> {
     try {
       const template = await this.prismaService.template.findUnique({

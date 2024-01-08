@@ -70,6 +70,11 @@ export class WorkspacesController {
         }
     }
 
+    @Get('by-token/:token')
+    getWorkspaceByToken(@Param('token') token: string): any {
+        return this.workspaceService.getWorkspaceByToken(token);
+    }
+
     @Get(":id/members")
     @UseGuards(WorkspaceGuard)
     getWorkspaceMembers(@Param('id', ParseIntPipe) id: number, @Query('search') search: string): any {
