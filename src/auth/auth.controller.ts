@@ -6,7 +6,6 @@ import { User } from '@prisma/client';
 import { GetUser } from './decorators/get-user.decorator';
 import { JwtAuthGuard } from './guards';
 import { ConfigService } from '@nestjs/config';
-import { OAuth2Client } from 'google-auth-library';
 
 @Controller('auth')
 @UseInterceptors(ResponseInterceptor)
@@ -15,11 +14,6 @@ export class AuthController {
     private authService: AuthService,
     private configService: ConfigService
   ) { }
-
-  private googleClient = new OAuth2Client(
-    this.configService.get('GOOGLE_CLIENT_ID'),
-    this.configService.get('GOOGLE_CLIENT_SECRET'),
-  );
 
   @HttpCode(HttpStatus.CREATED)
   @Post('signup')
