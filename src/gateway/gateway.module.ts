@@ -3,8 +3,8 @@ import { AppGateway } from './app.gateway';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MessagesService } from 'src/messages/messages.service';
-import { NotificationsService } from 'src/notifications/notifications.service';
+import { MessagesService } from '../messages/messages.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Module({
   imports: [
@@ -22,4 +22,4 @@ import { NotificationsService } from 'src/notifications/notifications.service';
   ],
   providers: [AppGateway, MessagesService, NotificationsService],
 })
-export class GatewayModule { }
+export class GatewayModule {}

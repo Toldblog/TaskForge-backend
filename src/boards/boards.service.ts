@@ -1,10 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { UtilService } from 'src/common/providers';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { UtilService } from '../common/providers';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateBoardDto, ShareBoardDto } from './dtos';
 import * as crypto from 'crypto';
 
@@ -13,25 +9,25 @@ export class BoardsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
-  ) { }
+  ) {}
 
   async getBoardByToken(token: string): Promise<any> {
     try {
       const board = await this.prismaService.board.findFirst({
         where: {
-          inviteToken: token
-        }
+          inviteToken: token,
+        },
       });
       if (!board) {
-        throw new NotFoundException("Board not found");
+        throw new NotFoundException('Board not found');
       }
 
       return {
         workspace: {
           id: board.id,
-          name: board.name
-        }
-      }
+          name: board.name,
+        },
+      };
     } catch (error) {
       throw error;
     }
@@ -105,9 +101,7 @@ export class BoardsService {
         },
       });
       if (boardMember) {
-        throw new BadRequestException(
-          'The user is already a member of the board',
-        );
+        throw new BadRequestException('The user is already a member of the board');
       }
 
       // add new member to board
@@ -201,7 +195,7 @@ export class BoardsService {
   async outOfBoard(userId: number, boardId: number): Promise<any> {
     try {
       const boardMember = await this.prismaService.boardMember.findUnique({
-        where: { id: { userId, boardId } }
+        where: { id: { userId, boardId } },
       });
       if (!boardMember) {
         throw new BadRequestException('The user is not a member of this board');
@@ -209,7 +203,7 @@ export class BoardsService {
 
       // delete boardMember
       await this.prismaService.boardMember.delete({
-        where: { id: { userId, boardId } }
+        where: { id: { userId, boardId } },
       });
 
       // delete all cardAssignee that the user joined
@@ -218,10 +212,10 @@ export class BoardsService {
           assigneeId: userId,
           card: {
             list: {
-              boardId
-            }
-          }
-        }
+              boardId,
+            },
+          },
+        },
       });
 
       return null;

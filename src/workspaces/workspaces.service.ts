@@ -1,11 +1,7 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
-import { UtilService } from 'src/common/providers';
-// import { AppGateway } from 'src/gateway/app.gateway';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { UtilService } from '../common/providers';
+// import { AppGateway } from '../gateway/app.gateway';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class WorkspacesService {
@@ -13,25 +9,25 @@ export class WorkspacesService {
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
     // private readonly appGateway: AppGateway
-  ) { }
+  ) {}
 
   async getWorkspaceByToken(token: string): Promise<any> {
     try {
       const workspace = await this.prismaService.workspace.findFirst({
         where: {
-          inviteToken: token
-        }
+          inviteToken: token,
+        },
       });
       if (!workspace) {
-        throw new NotFoundException("Workspace not found");
+        throw new NotFoundException('Workspace not found');
       }
 
       return {
         workspace: {
           id: workspace.id,
-          name: workspace.name
-        }
-      }
+          name: workspace.name,
+        },
+      };
     } catch (error) {
       throw error;
     }
@@ -71,23 +67,16 @@ export class WorkspacesService {
       const workspace = await this.prismaService.workspace.findUnique({
         where: { id: workspaceId },
       });
-      const workspaceMember = await this.prismaService.workspaceMember.findMany(
-        {
-          where: {
-            workspaceId,
-          },
+      const workspaceMember = await this.prismaService.workspaceMember.findMany({
+        where: {
+          workspaceId,
         },
-      );
+      });
 
       if (workspaceMember.length == 1) {
         throw new BadRequestException('Can not leave this workspace');
-      } else if (
-        workspace.adminIds.length == 1 &&
-        workspace.adminIds[0] === userId
-      ) {
-        throw new BadRequestException(
-          'You should allow other workspace members to be a administrator before leaving.',
-        );
+      } else if (workspace.adminIds.length == 1 && workspace.adminIds[0] === userId) {
+        throw new BadRequestException('You should allow other workspace members to be a administrator before leaving.');
       }
 
       await this.prismaService.workspaceMember.delete({
@@ -106,20 +95,20 @@ export class WorkspacesService {
           card: {
             list: {
               board: {
-                workspaceId
-              }
-            }
-          }
-        }
+                workspaceId,
+              },
+            },
+          },
+        },
       });
       // delete all boardMember that the user joined
       await this.prismaService.boardMember.deleteMany({
         where: {
           userId,
           board: {
-            workspace: { id: workspaceId }
-          }
-        }
+            workspace: { id: workspaceId },
+          },
+        },
       });
 
       return null;
@@ -128,10 +117,7 @@ export class WorkspacesService {
     }
   }
 
-  async removeWorkspaceMember(
-    workspaceId: number,
-    userId: number,
-  ): Promise<any> {
+  async removeWorkspaceMember(workspaceId: number, userId: number): Promise<any> {
     try {
       const workspace = await this.prismaService.workspace.findUnique({
         where: { id: workspaceId },
@@ -162,20 +148,20 @@ export class WorkspacesService {
           card: {
             list: {
               board: {
-                workspaceId
-              }
-            }
-          }
-        }
+                workspaceId,
+              },
+            },
+          },
+        },
       });
       // delete all boardMember that the user joined
       await this.prismaService.boardMember.deleteMany({
         where: {
           userId,
           board: {
-            workspace: { id: workspaceId }
-          }
-        }
+            workspace: { id: workspaceId },
+          },
+        },
       });
 
       return null;
@@ -184,37 +170,27 @@ export class WorkspacesService {
     }
   }
 
-  async addAdminToWorkspace(
-    adminId: number,
-    adminName: string,
-    workspaceId: number,
-    userId: number,
-  ): Promise<any> {
+  async addAdminToWorkspace(adminId: number, adminName: string, workspaceId: number, userId: number): Promise<any> {
     try {
       const workspace = await this.prismaService.workspace.findUnique({
         where: { id: workspaceId },
       });
 
       if (workspace.adminIds.includes(userId)) {
-        throw new BadRequestException(
-          'The user is already an admin of the workspace',
-        );
+        throw new BadRequestException('The user is already an admin of the workspace');
       }
 
       // check the user is already a member of the workspace
-      const workspaceMember =
-        await this.prismaService.workspaceMember.findUnique({
-          where: {
-            id: {
-              userId,
-              workspaceId,
-            },
+      const workspaceMember = await this.prismaService.workspaceMember.findUnique({
+        where: {
+          id: {
+            userId,
+            workspaceId,
           },
-        });
+        },
+      });
       if (!workspaceMember) {
-        throw new BadRequestException(
-          'The user is not a member of the workspace',
-        );
+        throw new BadRequestException('The user is not a member of the workspace');
       }
 
       // update workspace admins

@@ -1,10 +1,6 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
-import { UtilService } from 'src/common/providers';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { UtilService } from '../common/providers';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class CommentsService {
@@ -24,9 +20,7 @@ export class CommentsService {
       }
       // check comment's deleting permission
       if (comment.userId !== userId) {
-        throw new ForbiddenException(
-          'You are not allowed to deleting this comment',
-        );
+        throw new ForbiddenException('You are not allowed to deleting this comment');
       }
 
       // delete comment
@@ -40,11 +34,7 @@ export class CommentsService {
     }
   }
 
-  async editComment(
-    userId: number,
-    commentId: number,
-    content: string,
-  ): Promise<any> {
+  async editComment(userId: number, commentId: number, content: string): Promise<any> {
     try {
       // check comment
       const comment = await this.prismaService.comment.findUnique({
@@ -55,9 +45,7 @@ export class CommentsService {
       }
       // check comment's editing permission
       if (comment.userId !== userId) {
-        throw new ForbiddenException(
-          'You are not allowed to edit this comment',
-        );
+        throw new ForbiddenException('You are not allowed to edit this comment');
       }
 
       // update comment
@@ -70,9 +58,7 @@ export class CommentsService {
       return {
         comment: {
           ...updatedComment,
-          commenter: this.utilService.filterUserResponse(
-            updatedComment.commenter,
-          ),
+          commenter: this.utilService.filterUserResponse(updatedComment.commenter),
         },
       };
     } catch (error) {
@@ -80,11 +66,7 @@ export class CommentsService {
     }
   }
 
-  async commentOnCard(
-    userId: number,
-    cardId: number,
-    content: string,
-  ): Promise<any> {
+  async commentOnCard(userId: number, cardId: number, content: string): Promise<any> {
     try {
       // Check card
       const card = await this.prismaService.card.findUnique({
@@ -140,7 +122,7 @@ export class CommentsService {
       // });
 
       return {
-        comment
+        comment,
       };
     } catch (error) {
       throw error;

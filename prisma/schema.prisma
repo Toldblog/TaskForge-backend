@@ -36,11 +36,6 @@ model User {
   @@map("users")
 }
 
-enum Role {
-  USER  @map("user")
-  ADMIN @map("admin")
-}
-
 model Workspace {
   id               Int               @id @unique @default(autoincrement())
   name             String
@@ -80,13 +75,6 @@ model Template {
 
   @@unique([name, type])
   @@map("templates")
-}
-
-enum TemplateType {
-  BUSINESS    @map("Businees")
-  DESIGN      @map("Design")
-  EDUCATION   @map("Education")
-  ENGINEERING @map("Engineering")
 }
 
 model Board {
@@ -184,11 +172,6 @@ model CardAttachment {
   @@map("card_attachment")
 }
 
-enum AttachmentType {
-  FILE @map("FILE")
-  LINK @map("LINK")
-}
-
 model Comment {
   id        Int      @id @unique @default(autoincrement())
   content   String
@@ -234,10 +217,10 @@ model Notification {
   receiverId  Int
   workspaceId Int?
   cardId      Int?
-  isRead      Boolean          @default(false)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   boardId     Int?
+  isRead      Boolean          @default(false)
   board       Board?           @relation(fields: [boardId], references: [id], onDelete: Cascade)
   card        Card?            @relation(fields: [cardId], references: [id], onDelete: Cascade)
   receiver    User             @relation("receive_notification", fields: [receiverId], references: [id], onDelete: Cascade)
@@ -245,6 +228,23 @@ model Notification {
   workspace   Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
+}
+
+enum Role {
+  USER  @map("user")
+  ADMIN @map("admin")
+}
+
+enum TemplateType {
+  BUSINESS    @map("Businees")
+  DESIGN      @map("Design")
+  EDUCATION   @map("Education")
+  ENGINEERING @map("Engineering")
+}
+
+enum AttachmentType {
+  FILE @map("FILE")
+  LINK @map("LINK")
 }
 
 enum NotificationType {

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { JwtStrategy } from 'src/auth/strategies';
+import { JwtStrategy } from '../auth/strategies';
 import { JwtModule } from '@nestjs/jwt';
-import { CRUDService } from 'src/common/providers';
+import { CRUDService } from '../common/providers';
 
 @Module({
   imports: [JwtModule],

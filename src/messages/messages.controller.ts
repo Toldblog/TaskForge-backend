@@ -1,15 +1,8 @@
-import {
-  Controller,
-  UseInterceptors,
-  UseGuards,
-  Get,
-  ParseIntPipe,
-  Param,
-} from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards';
-import { ResponseInterceptor } from 'src/common/interceptors';
-import { BoardGuard } from 'src/common/guards';
-import { CRUDService, UtilService } from 'src/common/providers';
+import { Controller, UseInterceptors, UseGuards, Get, ParseIntPipe, Param } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards';
+import { ResponseInterceptor } from '../common/interceptors';
+import { BoardGuard } from '../common/guards';
+import { CRUDService, UtilService } from '../common/providers';
 
 @Controller('messages')
 @UseGuards(JwtAuthGuard)
@@ -22,9 +15,7 @@ export class MessagesController {
 
   @Get(':boardId')
   @UseGuards(BoardGuard)
-  async getMessagesByBoard(
-    @Param('boardId', ParseIntPipe) boardId: number,
-  ): Promise<any> {
+  async getMessagesByBoard(@Param('boardId', ParseIntPipe) boardId: number): Promise<any> {
     try {
       let result = await this.crudService.getAll(
         'message',

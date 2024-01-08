@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTemplateDto, UpdateTemplateDto } from './dtos';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UtilService } from 'src/common/providers';
+import { PrismaService } from '../prisma/prisma.service';
+import { UtilService } from '../common/providers';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
 import { TemplateType } from '@prisma/client';
@@ -11,13 +11,10 @@ export class TemplatesService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilService,
-    private readonly configService: ConfigService
-  ) { }
+    private readonly configService: ConfigService,
+  ) {}
 
-  private supabase = createClient(
-    this.configService.get('SUPABASE_URL'),
-    this.configService.get('SUPABASE_API_KEY'),
-  );
+  private supabase = createClient(this.configService.get('SUPABASE_URL'), this.configService.get('SUPABASE_API_KEY'));
 
   async getAllTemplatesByType(templateType: string, search: string): Promise<any> {
     try {
@@ -26,15 +23,15 @@ export class TemplatesService {
           type: TemplateType.BUSINESS,
           name: {
             contains: search,
-            mode: 'insensitive'
-          }
-        }
+            mode: 'insensitive',
+          },
+        },
       });
 
       return {
         results: templates.length,
-        templates: templates.map(template => this.utilService.filterResponse(template))
-      }
+        templates: templates.map((template) => this.utilService.filterResponse(template)),
+      };
     } catch (error) {
       throw error;
     }
@@ -59,12 +56,12 @@ export class TemplatesService {
           ...body,
           type: TemplateType[body.type.toUpperCase()],
           defaultList: body.defaultList.split('/'),
-          defaultBackground: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/templates/${fileName}`
-        }
+          defaultBackground: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/templates/${fileName}`,
+        },
       });
 
       return {
-        template: this.utilService.filterResponse(template)
+        template: this.utilService.filterResponse(template),
       };
     } catch (error) {
       throw error;
@@ -77,7 +74,7 @@ export class TemplatesService {
         where: { id },
       });
       if (!checkTemplate) {
-        throw new NotFoundException("Template not found");
+        throw new NotFoundException('Template not found');
       }
 
       let template = null;
@@ -85,8 +82,8 @@ export class TemplatesService {
       if (body.defaultList) {
         body = {
           ...body,
-          defaultList: body.defaultList.split('/')
-        }
+          defaultList: body.defaultList.split('/'),
+        };
       }
 
       if (background) {
@@ -109,22 +106,24 @@ export class TemplatesService {
           data: {
             ...body,
             type: body.type ? TemplateType[body.type.toUpperCase()] : checkTemplate.type,
-            defaultBackground: `${this.configService.get('SUPABASE_URL')}/storage/v1/object/public/templates/${fileName}`
-          }
+            defaultBackground: `${this.configService.get(
+              'SUPABASE_URL',
+            )}/storage/v1/object/public/templates/${fileName}`,
+          },
         });
       } else {
         template = await this.prismaService.template.update({
           where: { id },
           data: {
             ...body,
-            type: body.type ? TemplateType[body.type.toUpperCase()] : checkTemplate.type
-          }
+            type: body.type ? TemplateType[body.type.toUpperCase()] : checkTemplate.type,
+          },
         });
       }
 
       return {
-        template: this.utilService.filterResponse(template)
-      }
+        template: this.utilService.filterResponse(template),
+      };
     } catch (error) {
       throw error;
     }

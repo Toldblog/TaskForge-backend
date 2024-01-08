@@ -14,13 +14,13 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '@prisma/client';
-import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { GetUser } from '../auth/decorators/get-user.decorator';
 import { UpdateUserDto } from './dtos';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Role, Roles, RolesGuard } from 'src/common/guards';
-import { ResponseInterceptor } from 'src/common/interceptors';
-import { JwtAuthGuard } from 'src/auth/guards';
-import { UtilService } from 'src/common/providers';
+import { Role, Roles, RolesGuard } from '../common/guards';
+import { ResponseInterceptor } from '../common/interceptors';
+import { JwtAuthGuard } from '../auth/guards';
+import { UtilService } from '../common/providers';
 import { CRUDService } from '../common/providers';
 
 @Controller('users')
@@ -31,7 +31,7 @@ export class UsersController {
     private crudService: CRUDService,
     private usersService: UsersService,
     private utilService: UtilService,
-  ) { }
+  ) {}
 
   // ME
 
@@ -41,10 +41,7 @@ export class UsersController {
   }
 
   @Patch('me')
-  updateMe(
-    @GetUser() user: User,
-    @Body() updateUserDto: UpdateUserDto,
-  ): Promise<any> {
+  updateMe(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto): Promise<any> {
     return this.usersService.updateMe(user.id, updateUserDto);
   }
 
@@ -52,7 +49,7 @@ export class UsersController {
   async deleteMe(@GetUser() user: User): Promise<any> {
     try {
       await this.crudService.updateOne('user', user.id, {
-        active: false
+        active: false,
       });
 
       return null;
@@ -63,10 +60,7 @@ export class UsersController {
 
   @Post('upload-avatar')
   @UseInterceptors(FileInterceptor('avatar', {}))
-  uploadAvatar(
-    @GetUser() user: User,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<any> {
+  uploadAvatar(@GetUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<any> {
     return this.usersService.uploadAvatar(user.id, file);
   }
 
@@ -76,13 +70,13 @@ export class UsersController {
     try {
       const result = await this.crudService.getAll('user', options);
       if (user.role === 'USER') {
-        result['users'] = result['users'].filter(user => user.role === 'USER');
+        result['users'] = result['users'].filter((user) => user.role === 'USER');
       }
 
       return {
         results: result.results,
-        users: result['users'].map(user => this.utilService.filterUserResponse(user))
-      }
+        users: result['users'].map((user) => this.utilService.filterUserResponse(user)),
+      };
     } catch (error) {
       throw error;
     }
@@ -93,8 +87,8 @@ export class UsersController {
     try {
       const result = await this.crudService.getOne('user', id);
       return {
-        user: this.utilService.filterUserResponse(result['user'])
-      }
+        user: this.utilService.filterUserResponse(result['user']),
+      };
     } catch (error) {
       throw error;
     }
@@ -106,8 +100,8 @@ export class UsersController {
     try {
       const result = await this.crudService.updateOne('user', id, body);
       return {
-        user: this.utilService.filterUserResponse(result['user'])
-      }
+        user: this.utilService.filterUserResponse(result['user']),
+      };
     } catch (error) {
       throw error;
     }

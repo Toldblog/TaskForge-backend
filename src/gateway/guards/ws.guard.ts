@@ -1,13 +1,9 @@
-import {
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { Socket } from 'socket.io';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class WsGuard extends AuthGuard('jwt') {
@@ -38,13 +34,8 @@ export class WsGuard extends AuthGuard('jwt') {
         where: { id },
       });
 
-      if (
-        user.changePasswordAt &&
-        iat < parseFloat(user.changePasswordAt.getTime().toString()) / 1000
-      ) {
-        throw new UnauthorizedException(
-          'Your password has already been changed.',
-        );
+      if (user.changePasswordAt && iat < parseFloat(user.changePasswordAt.getTime().toString()) / 1000) {
+        throw new UnauthorizedException('Your password has already been changed.');
       }
 
       // 💡 We're assigning the payload to the request object here
@@ -64,8 +55,7 @@ export class WsGuard extends AuthGuard('jwt') {
   }
 
   private extractTokenFromHeader(client: Socket): string | undefined {
-    const [type, token] =
-      client.handshake.headers.authorization?.split(' ') ?? [];
+    const [type, token] = client.handshake.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
 }

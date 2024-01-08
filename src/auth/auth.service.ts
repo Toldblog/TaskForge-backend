@@ -8,11 +8,12 @@ import {
 import { SignUpCredentialsDto, SignInDto, UpdatePasswordDto, ResetPasswordDto, GoogleAddPasswordDto } from './dtos/index';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
+// import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
-import { MailService } from 'src/email/mail.service';
+import { MailService } from '../email/mail.service';
 import * as crypto from 'crypto';
-import { UtilService } from 'src/common/providers';
+import { UtilService } from '../common/providers';
 
 @Injectable()
 export class AuthService {

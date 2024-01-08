@@ -1,4 +1,4 @@
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Message } from '@prisma/client';
 
@@ -6,11 +6,7 @@ import { Message } from '@prisma/client';
 export class MessagesService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async sendMessage(
-    userId: number,
-    boardId: number,
-    content: string,
-  ): Promise<Message> {
+  async sendMessage(userId: number, boardId: number, content: string): Promise<Message> {
     try {
       // Add messages
       const message = await this.prismaService.message.create({

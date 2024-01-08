@@ -1,4 +1,4 @@
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateNotificationDto } from "./dtos";
 import { NotificationType } from "@prisma/client";

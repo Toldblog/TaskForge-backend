@@ -12,12 +12,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { JwtAuthGuard } from 'src/auth/guards';
-import { ResponseInterceptor } from 'src/common/interceptors';
-import { CRUDService } from 'src/common/providers';
-import { BoardGuard, Roles, RolesGuard, Role, WorkspaceGuard } from 'src/common/guards';
+import { JwtAuthGuard } from '../auth/guards';
+import { ResponseInterceptor } from '../common/interceptors';
+import { CRUDService } from '../common/providers';
+import { BoardGuard, Roles, RolesGuard, Role, WorkspaceGuard } from '../common/guards';
 import { CreateBoardDto, UpdateBoardDto, ShareBoardDto } from './dtos';
-import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from '@prisma/client';
 
 @Controller('boards')
@@ -27,7 +27,7 @@ export class BoardsController {
   constructor(
     private boardService: BoardsService,
     private crudService: CRUDService,
-  ) { }
+  ) {}
 
   @Get()
   @Roles(Role.ADMIN)
@@ -52,8 +52,8 @@ export class BoardsController {
         },
         {
           board: {
-            include: { workspace: true }
-          }
+            include: { workspace: true },
+          },
         },
       );
 
@@ -123,12 +123,12 @@ export class BoardsController {
               include: {
                 cardAttachments: true,
                 cardAssignees: {
-                  include: { assignee: true }
+                  include: { assignee: true },
                 },
-                comments: true
-              }
-            }
-          }
+                comments: true,
+              },
+            },
+          },
         },
         boardMembers: {
           include: {
@@ -166,9 +166,9 @@ export class BoardsController {
             name: result.board.name,
             creatorId: result.board.creatorId,
             background: result.board.background,
-            closed: result.board.closed
-          }
-        }
+            closed: result.board.closed,
+          },
+        };
       }
       return result;
     } catch (error) {
@@ -208,7 +208,7 @@ export class BoardsController {
   @UseGuards(BoardGuard)
   removeBoardMember(
     @Param('boardId', ParseIntPipe) boardId: number,
-    @Param('userId', ParseIntPipe) userId: number
+    @Param('userId', ParseIntPipe) userId: number,
   ): any {
     return this.boardService.outOfBoard(userId, boardId);
   }
@@ -284,7 +284,7 @@ export class BoardsController {
     return this.boardService.acceptInvitationLink(user.id, token);
   }
 
-  @Get(":id/members")
+  @Get(':id/members')
   @UseGuards(BoardGuard)
   getWorkspaceMembers(@Param('id', ParseIntPipe) id: number, @Query('search') search: string): any {
     return this.boardService.getBoardMembers(id, search ? search : '');

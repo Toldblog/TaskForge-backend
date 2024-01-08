@@ -1,12 +1,9 @@
-import {
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dtos';
 import { createClient } from '@supabase/supabase-js';
 import { ConfigService } from '@nestjs/config';
-import { UtilService } from 'src/common/providers';
+import { UtilService } from '../common/providers';
 
 @Injectable()
 export class UsersService {
@@ -16,15 +13,9 @@ export class UsersService {
     private readonly utilService: UtilService,
   ) {}
 
-  private supabase = createClient(
-    this.configService.get('SUPABASE_URL'),
-    this.configService.get('SUPABASE_API_KEY'),
-  );
+  private supabase = createClient(this.configService.get('SUPABASE_URL'), this.configService.get('SUPABASE_API_KEY'));
 
-  async updateMe(
-    userId: number,
-    updateUserDto: UpdateUserDto,
-  ): Promise<{ user: any }> {
+  async updateMe(userId: number, updateUserDto: UpdateUserDto): Promise<{ user: any }> {
     const { username } = updateUserDto;
 
     try {
@@ -54,13 +45,10 @@ export class UsersService {
     }
   }
 
-  async uploadAvatar(
-    userId: number,
-    file: Express.Multer.File,
-  ): Promise<{ user: any }> {
+  async uploadAvatar(userId: number, file: Express.Multer.File): Promise<{ user: any }> {
     try {
       // create random file name
-      const fileName = `avatar-${userId}-${Date.now()}.${file.originalname.split('.').pop() }`;
+      const fileName = `avatar-${userId}-${Date.now()}.${file.originalname.split('.').pop()}`;
 
       // upload file
       const { error: storageError } = await this.supabase.storage

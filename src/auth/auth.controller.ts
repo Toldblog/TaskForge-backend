@@ -1,7 +1,25 @@
-import { Body, Controller, Post, HttpCode, HttpStatus, UseInterceptors, Patch, UseGuards, Param, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  HttpCode,
+  HttpStatus,
+  UseInterceptors,
+  Patch,
+  UseGuards,
+  Param,
+  Get,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignUpCredentialsDto, SignInDto, UpdatePasswordDto, ForgotPasswordDto, ResetPasswordDto, GoogleAddPasswordDto } from './dtos/index';
-import { ResponseInterceptor } from 'src/common/interceptors';
+import {
+  SignUpCredentialsDto,
+  SignInDto,
+  UpdatePasswordDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  GoogleAddPasswordDto,
+} from './dtos/index';
+import { ResponseInterceptor } from '../common/interceptors';
 import { User } from '@prisma/client';
 import { GetUser } from './decorators/get-user.decorator';
 import { JwtAuthGuard } from './guards';
@@ -10,7 +28,7 @@ import { AuthGuard } from '@nestjs/passport';
 @Controller('auth')
 @UseInterceptors(ResponseInterceptor)
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post('signup')
@@ -29,10 +47,7 @@ export class AuthController {
 
   @Patch('update-password')
   @UseGuards(JwtAuthGuard)
-  updatePassword(
-    @GetUser() user: User,
-    @Body() updatePasswordDto: UpdatePasswordDto,
-  ): Promise<any> {
+  updatePassword(@GetUser() user: User, @Body() updatePasswordDto: UpdatePasswordDto): Promise<any> {
     return this.authService.updatePassword(user.id, updatePasswordDto);
   }
 
@@ -42,16 +57,13 @@ export class AuthController {
   }
 
   @Patch('reset-password/:token')
-  resetPassword(
-    @Param('token') token: string,
-    @Body() resetPasswordDto: ResetPasswordDto,
-  ): Promise<any> {
+  resetPassword(@Param('token') token: string, @Body() resetPasswordDto: ResetPasswordDto): Promise<any> {
     return this.authService.resetPassword(token, resetPasswordDto);
   }
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth() { }
+  async googleAuth() {}
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))

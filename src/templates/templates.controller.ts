@@ -1,9 +1,24 @@
-import { Body, Controller, Delete, FileTypeValidator, Get, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  FileTypeValidator,
+  Get,
+  Param,
+  ParseFilePipe,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { TemplatesService } from './templates.service';
-import { CRUDService } from 'src/common/providers';
-import { JwtAuthGuard } from 'src/auth/guards';
-import { Role, Roles, RolesGuard } from 'src/common/guards';
-import { ResponseInterceptor } from 'src/common/interceptors';
+import { CRUDService } from '../common/providers';
+import { JwtAuthGuard } from '../auth/guards';
+import { Role, Roles, RolesGuard } from '../common/guards';
+import { ResponseInterceptor } from '../common/interceptors';
 import { CreateTemplateDto, UpdateTemplateDto } from './dtos';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -13,8 +28,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class TemplatesController {
   constructor(
     private readonly templatesService: TemplatesService,
-    private readonly crudService: CRUDService
-  ) { }
+    private readonly crudService: CRUDService,
+  ) {}
 
   @Get()
   async getAllTemplates(@Query() options: any): Promise<any> {
@@ -48,11 +63,10 @@ export class TemplatesController {
     @Body() body: CreateTemplateDto,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [
-          new FileTypeValidator({ fileType: 'image/*' }),
-        ],
-      })
-    ) background: Express.Multer.File,
+        validators: [new FileTypeValidator({ fileType: 'image/*' })],
+      }),
+    )
+    background: Express.Multer.File,
   ): any {
     return this.templatesService.createTemplate(body, background);
   }
