@@ -37,20 +37,19 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
                     secret: this.configService.get('JWT_SECRET')
                 }
             );
-
             // check if the password was changed after the token'd been created 
             const { id, iat } = payload;
             const user = await this.prismaService.user.findUnique({
                 where: { id },
             });
-
+            
             if (
                 user.changePasswordAt &&
                 iat < parseFloat(user.changePasswordAt.getTime().toString()) / 1000
             ) {
                 throw new UnauthorizedException("Your password has already been changed.");
             }
-
+            
             if(!user.active) {
                 throw new UnauthorizedException("This account is not active.");
             }

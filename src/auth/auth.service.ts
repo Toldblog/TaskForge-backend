@@ -9,7 +9,6 @@ import { SignUpCredentialsDto, SignInDto, UpdatePasswordDto, ResetPasswordDto, G
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from '@prisma/client';
 import { MailService } from 'src/email/mail.service';
 import * as crypto from 'crypto';
 import { UtilService } from 'src/common/providers';
@@ -97,7 +96,39 @@ export class AuthService {
     }
   }
 
-  async googleLogin(user: User): Promise<{ user: any, accessToken: string }> {
+  async googleLogin(
+    email: string, name: string, givenName: string, familyName: string, avatar: string
+  ): Promise<{ user: any, accessToken: string }> {
+    let user = await this.prismaService.user.findFirst({
+      where: { email }
+    });
+
+
+    // if user does not exist, create a new user with profile information (** NOT set active for user)
+    // 'active' attribute only changed when user is created by sign up or password is added
+    if (!user) {
+      // create a random username for the new user
+      let username = `${familyName.substring(0, 2)}${givenName.split(" ").pop()}`;
+      username = username.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+      while (await this.prismaService.user.findFirst({
+        where: { username }
+      })) {
+        const rand = Math.floor(Math.random() * 10000);
+        username = `${username}${rand}`;
+      }
+
+      user = await this.prismaService.user.create({
+        data: {
+          email,
+          username,
+          name,
+          avatar,
+          active: true
+        }
+      });
+    }
+
     const userRes = this.utilService.filterUserResponse(user);
     const accessToken = await this.generateAccessToken(user.id);
 
