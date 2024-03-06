@@ -1,0 +1,267 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   Int               @id @unique @default(autoincrement())
+  username             String            @unique
+  email                String            @unique
+  name                 String
+  password             String?
+  passwordConfirm      String?
+  bio                  String?
+  changePasswordAt     DateTime?
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+  active               Boolean           @default(false)
+  avatar               String?
+  role                 Role              @default(USER)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  boardMembers         BoardMember[]
+  boards               Board[]
+  cardActivities       CardActivity[]
+  cardAssignees        CardAssignee[]
+  comments             Comment[]
+  messages             Message[]
+  receiveNotifications Notification[]    @relation("receive_notification")
+  sendNotifications    Notification[]    @relation("send_notification")
+  workspaceMembers     WorkspaceMember[]
+  Token                Token[]
+
+  @@map("users")
+}
+
+model Token {
+  id        Int      @id @unique @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tokens")
+}
+
+model Workspace {
+  id               Int               @id @unique @default(autoincrement())
+  name             String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  adminIds         Int[]
+  inviteToken      String?           @unique
+  description      String?
+  boards           Board[]
+  notifications    Notification[]
+  workspaceMembers WorkspaceMember[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  userId      Int
+  workspaceId Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@id([userId, workspaceId], name: "id")
+  @@map("workspace_member")
+}
+
+model Template {
+  id                Int          @id @unique @default(autoincrement())
+  name              String
+  description       String
+  type              TemplateType @default(BUSINESS)
+  defaultList       String[]     @default([])
+  defaultBackground String
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@unique([name, type])
+  @@map("templates")
+}
+
+model Board {
+  id            Int            @id @unique @default(autoincrement())
+  name          String
+  background    String
+  visibility    Boolean        @default(true)
+  closed        Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  creatorId     Int
+  workspaceId   Int
+  templateId    Int
+  inviteToken   String?        @unique
+  listsOrder    Int[]          @default([])
+  boardMembers  BoardMember[]
+  creator       User           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  lists         List[]
+  messages      Message[]
+  notifications Notification[]
+
+  @@map("boards")
+}
+
+model BoardMember {
+  userId           Int
+  boardId          Int
+  starred          Boolean   @default(false)
+  viewRecentlyDate DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  board            Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, boardId], name: "id")
+  @@map("board_member")
+}
+
+model List {
+  id         Int      @id @unique @default(autoincrement())
+  name       String
+  boardId    Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  cardsOrder Int[]    @default([])
+  cards      Card[]
+  board      Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  @@map("lists")
+}
+
+model Card {
+  id              Int              @id @unique @default(autoincrement())
+  title           String
+  description     String?
+  active          Boolean          @default(true)
+  dueDate         DateTime?
+  reminderDate    DateTime?
+  listId          Int
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  cardActivities  CardActivity[]
+  cardAssignees   CardAssignee[]
+  cardAttachments CardAttachment[]
+  list            List             @relation(fields: [listId], references: [id], onDelete: Cascade)
+  comments        Comment[]
+  notifications   Notification[]
+
+  @@map("cards")
+}
+
+model CardAssignee {
+  assigneeId Int
+  cardId     Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  assignee   User     @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
+  card       Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@id([assigneeId, cardId], name: "id")
+  @@map("card_assignee")
+}
+
+model CardAttachment {
+  id        Int            @id @unique @default(autoincrement())
+  fileName  String
+  url       String
+  type      AttachmentType @default(FILE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  cardId    Int
+  card      Card           @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@map("card_attachment")
+}
+
+model Comment {
+  id        Int      @id @unique @default(autoincrement())
+  content   String
+  userId    Int
+  cardId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  commenter User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Message {
+  id        Int      @id @unique @default(autoincrement())
+  content   String
+  userId    Int
+  boardId   Int
+  createdAt DateTime @default(now())
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  sender    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model CardActivity {
+  id        Int      @id @unique @default(autoincrement())
+  activity  String
+  userId    Int
+  cardId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("card_activity")
+}
+
+model Notification {
+  id          Int              @id @unique @default(autoincrement())
+  type        NotificationType @default(COMMENT)
+  senderId    Int
+  receiverId  Int
+  workspaceId Int?
+  cardId      Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  boardId     Int?
+  isRead      Boolean          @default(false)
+  board       Board?           @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  card        Card?            @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  receiver    User             @relation("receive_notification", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender      User             @relation("send_notification", fields: [senderId], references: [id], onDelete: Cascade)
+  workspace   Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum Role {
+  USER  @map("user")
+  ADMIN @map("admin")
+}
+
+enum TemplateType {
+  BUSINESS    @map("Businees")
+  DESIGN      @map("Design")
+  EDUCATION   @map("Education")
+  ENGINEERING @map("Engineering")
+}
+
+enum AttachmentType {
+  FILE @map("FILE")
+  LINK @map("LINK")
+}
+
+enum NotificationType {
+  ADD_ADMIN        @map("ADD_ADMIN")
+  REMOVE_WORKSPACE @map("REMOVE_WORKSPACE")
+  ASSIGNMENT       @map("ASSIGNMENT")
+  COMMENT          @map("COMMENT")
+  ADD_TO_BOARD     @map("ADD_TO_BOARD")
+}

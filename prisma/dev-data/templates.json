@@ -1,0 +1,444 @@
+[
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/5e627d9fa6c99f7637f32c47/2560x1440/c0d295ff3ef480a03090b113f1eae301/crmble_trello_order-mgmt.png",
+        "name": "A Lead Management Pipeline by Crmble",
+        "description": "Use this template to manage relations with important contacts for your business. Feel free to change or add more lists to cutomize the stages of your funnel to your needs.",
+        "type": "Business",
+        "defaultList": [
+            "New Lead 🙋",
+            "Discovery call 🤝",
+            "Proposal review 🔎",
+            "Processed",
+            "Future follow-up 🔮"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/1280x1920/842930275c7de22dfabb6bb21b3cb8cd/photo-1590978553854-f1c0fe76ca70.jpg",
+        "name": "Lean Canvas",
+        "description": "Lean Canvas is a 1-page business plan template created by Ash Maurya that helps you deconstruct your idea into its key assumptions. It is adapted from Alex Osterwalder's Business Model Canvas and optimized for Lean Startups. It replaces elaborate business plans with a single page business model.",
+        "type": "Business",
+        "defaultList": [
+            "1. Problem",
+            "2. Customer Segments",
+            "3. Unique Value Propositions",
+            "4. Solution",
+            "5. Unfair Advantage",
+            "6. Revenue Streams",
+            "7. Cost Structure",
+            "8. Key Metrics",
+            "9. Channels"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2400x1600/7f16c6eb93506d217fd0954458890909/photo-1537134394103-214adc4bd836.jpg",
+        "name": "Nonprofit Project Management",
+        "description": "Big dreams turn into bigger results with a killer project plan. Use this basic structure to build your team's ideal workflow, for projects big or small.",
+        "type": "Business",
+        "defaultList": [
+            "Project Resources",
+            "Questions For Next Meeting",
+            "To Do",
+            "Pending",
+            "Blocked",
+            "Done"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/1280x1920/0b921b1dbc79d63fe6d71a67517808d1/photo-1544357513-401463078b59.jpg",
+        "name": "Business Model Canvas",
+        "description": "Business Model Canvas is a strategic management and lean startup template for developing new or documenting existing business models. It is a visual chart with elements describing a firm's or product's value proposition, infrastructure, customers, and finances. Add cards under each list as you define your criteria.",
+        "type": "Business",
+        "defaultList": [
+            "1. Value Propositions",
+            "2. Customer Segments",
+            "3. Channels",
+            "4. Customer Relationships",
+            "5. Revenue Streams",
+            "6. Key Resources",
+            "7. Key Partnerships",
+            "8. Key Activities",
+            "9. Cost Structure"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2401x1600/cf8274d3ee4a86a151953a4baad1a1bd/photo-1487446929682-f62f73984006.jpg",
+        "name": "Design Project Template",
+        "description": "An easy to use template for planning and monitoring your branding and product design projects online.",
+        "type": "Design",
+        "defaultList": [
+            "Project Brief",
+            "Brand Identity",
+            "Product Design",
+            "Marketing Website",
+            "Client Reviews"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2400x1600/9eb2d682830dae055b61e1ebc54e1ddb/photo-1523726491678-bf852e717f6a.jpg",
+        "name": "Design System Checklist",
+        "description": "A design system unites product teams around a common visual language. It reduces the design debt, accelerates the design process, and builds bridges between teams working in concert to bring products to life.",
+        "type": "Design",
+        "defaultList": [
+            "Guidelines",
+            "UI Components",
+            "Design Tokens",
+            "Accessibility Touchpoints",
+            "SSOT (Single Source Of Truth) Components"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2400x1600/f9650585123ca82bae4358b8618ccfe6/photo-1452860606245-08befc0ff44b.jpg",
+        "name": "Freelance Branding Project",
+        "description": "Use this template to run your next Branding project. This board will help you build an easy, repeatable process that will help you and your clients know what's happening and what's coming up next.",
+        "type": "Design",
+        "defaultList": [
+            "New Client Onboarding",
+            "Creative Brief",
+            "Discovery",
+            "Design Phase",
+            "First Client Review Meeting",
+            "First Round of Revisions",
+            "Client Review",
+            "Final Handoff"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2400x1600/ee4afc28fad7c7932339b3278f4e185a/photo-1504805572947-34fad45aed93.jpg",
+        "name": "Game Design Template",
+        "description": "Use this Trello board as an easy to organize template for planning a video game project.",
+        "type": "Design",
+        "defaultList": [
+            "High Concept",
+            "Concept Art - List Style",
+            "Game Description",
+            "Gameplay Minute"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2400x1600/690360c54dbfe62a0fa6c2e545a017bf/photo-1428908728789-d2de25dbd4e2.jpg",
+        "name": "Remote Class Template",
+        "description": "Template for my suddenly-remote biochemistry course. A lot of students expressed that they were worried about staying on top of their coursework remotely, so this was my attempt to help them stay organized. There are cards for each week with check-lists of everything the students need to do for that week including lecture and lab assignments, studying time, and quizzes/exams. Additional lists have the big lab projects (with suggested breakdown of work by week) and more details on the exams (with the learning objectives attached for each one). This was also helpful for me to make and check that there weren't too many assignments stacking up in a particular week with the revised schedule.",
+        "type": "Education",
+        "defaultList": [
+            "Resources",
+            "Weekly Assignments",
+            "Lab Projects",
+            "Exams"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/575584dacedaafdf0d8660c2/1024x579/02a67bbc2d5b879d912dad85eb5f3a05/asset_3.png",
+        "name": "Teaching: Weekly Planning",
+        "description": "It essentially consists of “cards” that you put into “lists” on a “board”. I make a board for each class I teach where the lists are the weeks of the semester (including the week before and after) and the cards are things I need to do for my class each week. There’s also a “Done” list that cards get moved to as they are completed.",
+        "type": "Education",
+        "defaultList": [
+            "Beginning of Term",
+            "Week 1 (copy for remaining weeks)",
+            "End of Term"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2317x1600/c777bdcaa82e10e7ed542c47ce826093/photo-1542216172-f356fdd22653.jpg",
+        "name": "Project Based Learning",
+        "description": "The entirety of a students’ assessment is based on projects, so one of the key aspects of that is organizing your project, creating a timeline, responsibilities, and checklists.",
+        "type": "Education",
+        "defaultList": [
+            "Brainstorm & Research",
+            "Design",
+            "Development",
+            "Testing & Evaluation",
+            "Branding",
+            "Presentation"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/1280x1920/93ada3938911bad6d22b224806c390ad/photo-1615111784767-4d7c527f32a1.jpg",
+        "name": "Plan your Studies - Vet Student",
+        "description": "So much to learn, so little time! This template is designed to help vet students visualize their study workload and make a plan for the week based on upcoming exams.",
+        "type": "Education",
+        "defaultList": [
+            "To Do",
+            "Mon",
+            "Tues",
+            "Wed",
+            "Thurs",
+            "Fri",
+            "Sat",
+            "Sun",
+            "Done!"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2386x1600/47f09f0e3910259568294477d0bdedac/photo-1576502200916-3808e07386a5.jpg",
+        "name": "Kanban Template",
+        "description": "Use this simple Kanban template to keep the engineering team on the same page and moving through work fluidly.",
+        "type": "Engineering",
+        "defaultList": [
+            "Backlog",
+            "Design",
+            "To Do",
+            "Doing",
+            "Code Review",
+            "Testing",
+            "Done 🎉"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/4e8eb47da16fe58f9dbdf7d0/2560x1600/0f299a7485408e6ad3daac75476be678/background.png",
+        "name": "Scrum Board",
+        "description": "The Scrum Board by Corrello is a Template for a Software Development team following a Scrum process. There are some example Cards on the Board plus some additional details on how to get started in the How to use this Board List.",
+        "type": "Engineering",
+        "defaultList": [
+            "Backlog",
+            "Next Sprint",
+            "Sprint Backlog",
+            "Dev",
+            "Code Review",
+            "Testing",
+            "Done Sprint DATE - DATE 🎉"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2048x1152/c9ada8526a0585ddf17441d7e68dc9ac/photo-1593689217914-19621b0eac82.jpg",
+        "name": "Software Development [Web App, iOS App, Android App]",
+        "description": "Template for software development team to organize, manage tasks, manage deadlines and features for their software development projects.",
+        "type": "Engineering",
+        "defaultList": [
+            "🗃 Templates",
+            "🗒 Backlog",
+            "🗓 Sprint Backlog - [Timeline]",
+            "📅 Working On",
+            "🐞 Bugs",
+            "🧑🏾‍💻 Testing [Staging Server]",
+            "📆 Sprint - Done [Version: 1.2.0]"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2402x1600/1b101b2674301e95f8ed6abfb4f0181e/photo-1581896184337-1330180ac3e6.jpg",
+        "name": "Web Development",
+        "description": "Template to help web developers to organize and manage tasks and features for their projects and website development.",
+        "type": "Engineering",
+        "defaultList": [
+            "Backlog",
+            "New Features",
+            "Running Tasks",
+            "Fix & Upgrade",
+            "Phase 1 Testing",
+            "Phase 2 Testing",
+            "Ready",
+            "Done and Deployed"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2400x1600/88badc718574e79916d2330ccd49a75a/photo-1587270804625-48c99a3cc707.jpg",
+        "name": "Speaker guide for online events",
+        "description": "Regardless if you are a professional speaker and you do this dozen times per week, or you are just getting ready for your first public presentation, this board can help you get organized for speaking at a live streamed event.",
+        "type": "Business",
+        "defaultList": [
+            "YOUR PRESENTATION",
+            "STREAMING ENVIRONMENT",
+            "ON THE DAY",
+            "AFTER EVENT",
+            "IN PROGRESS",
+            "DONE"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2048x1201/4ff956445063b6458ae044342d2e76b2/photo-1507842217343-583bb7270b66.jpg",
+        "name": "Marketing Content Catalog",
+        "description": "Did you know that a majority of marketing content goes unused? It has nothing to do with the content's quality; it's just not accessible enough. With a marketing content catalog, you can centralize all the content your teams create and make it easily searchable.",
+        "type": "Business",
+        "defaultList": [
+            "Blog Posts",
+            "Gated Assets",
+            "ON THE DAY",
+            "Webinars",
+            "Case Studies",
+            "Export & Sync"
+        ]
+    },
+    {
+        "defaultBackground": "https://d2k1ftgv7pobq7.cloudfront.net/images/backgrounds/purty_wood_dark.png",
+        "name": "Marketing Overview",
+        "description": "Use this board with your marketing team to run smooth weekly team meetings and keep everybody on the same page with the status of projects.",
+        "type": "Business",
+        "defaultList": [
+            "Start Here!",
+            "Marketing Team This Week",
+            "Team Meeting",
+            "In Progress",
+            "Up Next",
+            "Done"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2048x2048/855e9acb690c544c840cdcb71a6d7b70/photo-1482442120256-9c03866de390.jpg",
+        "name": "Podcast Workflow Template",
+        "description": "This is the very template we use to organise and run Adaptavist Live and Team Titans podcasts, the top Atlassian ecosystem podcasts.",
+        "type": "Business",
+        "defaultList": [
+            "Resources",
+            "This Week",
+            "Podcast Content Shortlist",
+            "Parking / Waiting",
+            "Promotion"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2400x1600/b22d1f7e3ac76a926c2630141dd090bc/photo-1592781959774-4f2498f581d7.jpg",
+        "name": "Dating Funnel Template",
+        "description": "Both dates, collisions of misaligned values and nuanced dialogue unnoticed. Things I wanted to avoid. And so I built a Trello board to keep track of it all.",
+        "type": "Design",
+        "defaultList": [
+            "Vetting",
+            "Scheduling",
+            "Scheduled",
+            "Dating",
+            "No (Try to keep a bunch of cards in here so when you get dumped so you'll feel less crappy about yourself)",
+            "Hold (FarAway/IsUnavailable/etc.)"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/5b0c262371561d5257cb2c07/2560x1440/17406b2c01fb87b0232707fe98ea5111/TrelloTemplate-03.png",
+        "name": "Where to next: Travel inspiration board",
+        "description": "Your head says Miami. Your heart says Maui. Your intuition says hey, let’s not rush into this. This handy Trello board is the perfect tool to explore inspirational new destinations, compare costs, find out the best time to go and hold your hand all the way to take off time.",
+        "type": "Design",
+        "defaultList": [
+            "Bucket list",
+            "Things to think about",
+            "Travel costs",
+            "Best time to travel",
+            "Travel checklist",
+            "And done!"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/5874460daa34760c4ba7bd64/2560x1600/3ecbc05ba9e075a2c86d4f335b43d121/background-1%402x.png",
+        "name": "Guided Gratitude Practice",
+        "description": "Did you know cultivating a sense of gratitude acts as a buffer against feelings of anxiety and loneliness? (True story!) This board can guide your personal gratitude practice or help you establish a group practice with friends or colleagues.",
+        "type": "Design",
+        "defaultList": [
+            "The daily",
+            "Gratitude affirmations",
+            "That feeling when...",
+            "3 things!"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2401x1600/fd20a5912227344d8b140e72787e508c/photo-1541464522988-31b420f688b9.jpg",
+        "name": "My Climate Action Plan (MyCAP)",
+        "description": "The Business Council on Climate Change (BC3) is a membership-driven nonprofit organization of corporate sustainability leaders implementing and championing tangible climate action. Based in the San Francisco Bay Area, and working closely with the city of San Francisco, the organization serves as a platform to share climate change programs and incubate collaborative multi-sector engagement, while providing a model to replicate its innovative work.",
+        "type": "Design",
+        "defaultList": [
+            "👉🏼Getting Started",
+            "🌳Our Sustainability Goals",
+            "🥅 Set SMART Goals",
+            "🥗 Food",
+            "🚴🏼‍♀️ Transportation",
+            "🌊 Energy",
+            "📦 Waste",
+            "💡Reflection"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2397x1600/09074ade5bff1456ea55337903851c92/photo-1523266092241-0077129f31fe.jpg",
+        "name": "Mise-En-Place Personal Productivity System",
+        "description": "Increase your personal productivity each week with this board that Justin Gallagher, one of the creators of Trello, uses every day. Split your work into very specific lists so nothing falls through the cracks. Use the reference list to keep important information on hand. Hold yourself accountable with meeting notes, and most importantly spend some time each morning planning out the day ahead.",
+        "type": "Education",
+        "defaultList": [
+            "Start here!",
+            "Today",
+            "Tomorrow",
+            "This Week",
+            "Waiting",
+            "Inbox",
+            "Done!",
+            "References"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/1120x1920/4fadadcdac7dde6efb0c4e5b672cf638/photo-1579546928686-286c9fbde1ec.jpg",
+        "name": "Self-Advocacy Record",
+        "description": "Sharing a record of feedback you receive, goals you’re pursuing, and wins under your belt is a powerful way to advocate for yourself at work. Use this template to keep track of the following artifacts.",
+        "type": "Education",
+        "defaultList": [
+            "☆ Feedback",
+            "☆ Projects",
+            "☆ Leadership",
+            "☆ Personal Development",
+            "☆ Written Work",
+            "☆ \"Invisible\" work",
+            "☆ Service"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/1120x1920/3f06723d6882d2942a9b248f22f95f22/photo-1579547944212-c4f4961a8dd8.jpg",
+        "name": "Weekly Planner",
+        "description": "Plan every day of the week and after you're finished, just drag it to the done list!",
+        "type": "Education",
+        "defaultList": [
+            "Done",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2401x1600/3ec9b90c95f9c9ce4daa0a477a8ceca8/photo-1578403414495-5bb49bf9447b.jpg",
+        "name": "Life Watchers 2020",
+        "description": "Life Watchers, \"It's like Weight Watchers, but for your life!\"",
+        "type": "Education",
+        "defaultList": [
+            "2020 Resolutions",
+            "Life Watchers Missions",
+            "Done ✔️✨",
+            "Wins 🏆✨",
+            "Life 🔑",
+            "Health 🍎",
+            "Career 💻",
+            "Ideas 💡"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2397x1600/0b085a9b17db7d52cc7378e67ab21da7/photo-1472289065668-ce650ac443d2.jpg",
+        "name": "Client Workflow Management",
+        "description": "At Palace Law, case folders are now represented by a Trello card. Those cards are assigned to attorneys’ Trello boards, and attorneys use Trello features to prioritize their work. In the old model, an attorney manually marked a case folder indicating when it needed to be reviewed again. Now, they receive a reminder in Trello that it’s time to revisit a case.",
+        "type": "Engineering",
+        "defaultList": [
+            "New Client Onboarding",
+            "Attorney Assigned",
+            "Doing",
+            "On Hold",
+            "Win",
+            "Lost"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/575584dacedaafdf0d8660c2/2048x2048/b30b118405e4fbe5947cba512d6a19da/UN074431_2.JPG.jpg",
+        "name": "UNICEF Global Innovation Centre",
+        "description": "UNICEF's Global Innovation Centre team evaluates and implement ideas and technologies that can scale at a national or multinational level for improving the lives of children and their families more efficiently and accurately. They also explore what it means to be a truly distributed team enabled by technology.",
+        "type": "Engineering",
+        "defaultList": [
+            "Initial Interest",
+            "Formal Interest",
+            "Exploring | Scoping & Research",
+            "Exploring | Business Case",
+            "Pipeline | Under Review -> Contracting",
+            "Live | Deployed",
+            "Live | Victory"
+        ]
+    },
+    {
+        "defaultBackground": "https://trello-backgrounds.s3.amazonaws.com/5423102a85612209a94bcde8/2560x1440/575c4d97c9004f4f38e6a248ef8ac3ba/Budget_Full_HD.jpg",
+        "name": "Advanced Project Budgeting and Time Tracking",
+        "description": "If you are going to track your time and additional expenses spent on different projects along with tracking payments from clients this board is for you. Before the start of the project normally you are estimating Time needed to complete the project and also estimating additional costs.",
+        "type": "Engineering",
+        "defaultList": [
+            "To Do",
+            "Doing",
+            "Done"
+        ]
+    }
+]

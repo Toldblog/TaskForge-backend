@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>App</title>
+</head>
+
+<body>
+    <img style="height: 50px; width: 200px;" src="https://xdnhgafhgxsmohbrzbah.supabase.co/storage/v1/object/public/TaskForge-assets/logo_blue.png" alt="logo" />
+    <div>
+        {{ message }}. 
+        {{#if url}}
+            <a href="{{ url }}">Please click it to resend email verification again.</a>
+        {{/if}}
+    </div>
+</body>
+
+</html>

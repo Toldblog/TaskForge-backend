@@ -1,0 +1,62 @@
+[
+  {
+    "userId": 1,
+    "boardId": 1,
+    "starred": false,
+    "viewRecentlyDate": null
+  },
+  {
+    "userId": 2,
+    "boardId": 1,
+    "starred": false,
+    "viewRecentlyDate": null
+  },
+  {
+    "userId": 1,
+    "boardId": 2,
+    "starred": false,
+    "viewRecentlyDate": null
+  },
+  {
+    "userId": 2,
+    "boardId": 2,
+    "starred": false,
+    "viewRecentlyDate": null
+  },
+  {
+    "userId": 2,
+    "boardId": 3,
+    "starred": false,
+    "viewRecentlyDate": null
+  },
+  {
+    "userId": 3,
+    "boardId": 3,
+    "starred": false,
+    "viewRecentlyDate": null
+  },
+  {
+    "userId": 3,
+    "boardId": 4,
+    "starred": false,
+    "viewRecentlyDate": null
+  },
+  {
+    "userId": 4,
+    "boardId": 5,
+    "starred": false,
+    "viewRecentlyDate": null
+  },
+  {
+    "userId": 5,
+    "boardId": 5,
+    "starred": false,
+    "viewRecentlyDate": null
+  },
+  {
+    "userId": 12,
+    "boardId": 6,
+    "starred": false,
+    "viewRecentlyDate": null
+  }
+]
